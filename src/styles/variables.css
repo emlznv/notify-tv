@@ -1,0 +1,13 @@
+:root {
+  --color-background-main: #282c34;
+  --color-text-main: #ffffff;
+  --color-text-secondary: #add8e6;
+  --color-highlight-dark: #add8e6;
+  --color-highlight-light: #ffffff;
+  --color-button-add: #ffffff;
+  --color-button-added: #90ee90;
+  --color-button-delete: #808080;
+  --color-icon-rating: #ffa500;
+  --color-icon-runtime: #ffffff;
+  --color-faded: #808080;
+}

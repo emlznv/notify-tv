@@ -1,0 +1,35 @@
+.navigation-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  padding: 10px;
+  box-shadow: 0 1px 13px -4px;
+  margin-bottom: 12px;
+}
+
+.navigation-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-transform: uppercase;
+}
+
+.navigation-button.active,
+.notify-icon.active {
+  color: var(--color-text-main);
+}
+
+.navigation-button.not-active,
+.notify-icon.not-active {
+  color: var(--color-text-secondary);
+}
+
+.navigation-button:hover {
+  color: var(--color-text-main);
+  transition: 0.7s;
+}
+
+.notify-icon {
+  margin-right: 10px;
+}
