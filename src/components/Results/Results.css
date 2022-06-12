@@ -1,0 +1,8 @@
+.results-wrapper {
+  min-height: 100vh;
+  width: 100%;
+}
+
+.no-results-msg {
+  padding: 20px;
+}

@@ -1,0 +1,65 @@
+.show-card {
+  display: flex;
+  column-gap: 10px;
+  text-align: left;
+  align-items: center;
+  box-shadow: 0 4px 6px -4px var(--color-highlight-dark);
+  padding: 10px;
+  margin: 10px;
+}
+
+.show-poster-wrapper {
+  width: 50px;
+  height: fit-content;
+}
+
+.show-poster {
+  width: 100%;
+  height: 55px;
+  border-radius: 6px;
+  box-shadow: 4px 0px 13px var(--color-background-main);
+}
+
+.show-details {
+  width: 100%;
+  margin: 2px 0;
+}
+
+.premiere-date {
+  font-weight: normal;
+}
+
+.show-info {
+  display: flex;
+  margin: 2px 0;
+}
+
+.show-heading {
+  display: flex;
+  justify-content: space-between;
+}
+
+.show-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  width: calc(100% - 30px);
+}
+
+.show-rating {
+  margin-right: 15px;
+}
+
+.show-rating-icon,
+.show-runtime-icon {
+  margin-right: 5px;
+}
+
+.show-rating-icon {
+  color: var(--color-icon-rating);
+}
+
+.show-runtime-icon {
+  color: var(--color-icon-runtime);
+}
