@@ -2,13 +2,14 @@
   display: flex;
   column-gap: 10px;
   text-align: left;
-  align-items: center;
+  align-items: flex-start;
   box-shadow: 0 4px 6px -4px var(--color-highlight-dark);
   padding: 10px;
   margin: 10px;
 }
 
 .show-poster-wrapper {
+  margin-top: 5px;
   width: 50px;
   height: fit-content;
 }
@@ -37,6 +38,7 @@
 .show-heading {
   display: flex;
   justify-content: space-between;
+  align-items: end;
 }
 
 .show-title {
@@ -62,4 +64,24 @@
 
 .show-runtime-icon {
   color: var(--color-icon-runtime);
+}
+
+.show-summary {
+  margin-top: 10px;
+}
+
+.show-summary-button {
+  color: var(--color-text-main);
+  cursor: pointer;
+}
+
+.show-summary-button:hover {
+  color: var(--color-highlight-dark);
+  transition: 0.3s;
+}
+
+.show-genres-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
 }
