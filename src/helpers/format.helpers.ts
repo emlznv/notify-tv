@@ -1,4 +1,5 @@
 const NO_RESULT_TEXT = 'n/a';
+const NO_SUMMARY_TEXT = 'No overview available.';
 
 export const formatPremiere = (value?: string) => {
   return value ? ` (${value.substring(0, 4)})` : '';
@@ -20,4 +21,19 @@ export const formatGenres = (genres?: string[]) => {
 
 export const formatAvgRuntime = (avgRuntime?: number) => {
   return avgRuntime ? `${avgRuntime}m` : NO_RESULT_TEXT;
+};
+
+export const parseHtmlString = (htmlString: string): string => {
+  const divContainer = document.createElement('div');
+  divContainer.innerHTML = htmlString;
+  return divContainer.textContent || divContainer.innerText || '';
+};
+
+export const formatSummary = (summaryHtmlString?: string) => {
+  if (!summaryHtmlString) { return NO_SUMMARY_TEXT; }
+
+  const summary = parseHtmlString(summaryHtmlString);
+  const shortenedSummary = summary.split('. ').slice(0, 4).join('. ');
+  const endsWithDot = shortenedSummary[shortenedSummary.length - 1] === '.';
+  return endsWithDot ? shortenedSummary : `${shortenedSummary}.`;
 };

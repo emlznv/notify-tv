@@ -1,16 +1,23 @@
+import { useState } from 'react';
 import './ShowCard.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { faStar, faClock } from '@fortawesome/free-solid-svg-icons';
+import { faStar, faClock, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { IShow, IShowResponse } from '../../typescript/interfaces';
 import ActionButton from '../ActionButton/ActionButton';
-import { formatAvgRuntime, formatGenres, formatPremiere, formatRating } from '../../helpers/format.helpers';
+import {
+  formatAvgRuntime, formatGenres, formatPremiere, formatRating, formatSummary, parseHtmlString
+} from '../../helpers/format.helpers';
 import { ButtonType, Section } from '../../typescript/enums';
 
 const ShowCard = ({ data, section }: { data: any; section: Section }) => {
   const show: IShow = data.show || data;
-  const { name, image, genres, averageRuntime, rating, premiered } = show;
+  const { name, image, genres, averageRuntime, rating, premiered, summary } = show;
   const buttonType = section === Section.addedShows ? ButtonType.delete : ButtonType.add;
+
+  const [showSummary, setShowSummary] = useState<boolean>(false);
+  const handleShowSummary = () => setShowSummary(!showSummary);
+  const summaryIcon = showSummary ? faChevronUp : faChevronDown;
 
   return (
     show && (
@@ -48,7 +55,18 @@ const ShowCard = ({ data, section }: { data: any; section: Section }) => {
               {formatAvgRuntime(averageRuntime)}
             </span>
           </div>
-          <p>{formatGenres(genres)}</p>
+          <div className="show-genres-wrapper">
+            <p>{formatGenres(genres)}</p>
+            <FontAwesomeIcon
+              className="show-summary-button"
+              icon={summaryIcon}
+              size="lg"
+              onClick={handleShowSummary}
+            />
+          </div>
+          {showSummary && (
+            <p className="show-summary">{formatSummary(summary)}</p>
+          )}
         </div>
       </div>
     )
