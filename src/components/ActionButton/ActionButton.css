@@ -1,6 +1,7 @@
 .add-button,
 .added-button,
 .delete-button {
+  margin-top: 1px;
   border-radius: 100%;
 }
 
@@ -27,7 +28,6 @@
 }
 
 .add-button,
-.added-button,
 .delete-button {
   cursor: pointer;
 }
