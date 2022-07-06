@@ -8,11 +8,16 @@ import './ActionButton.css';
 interface IProps {
   show: IShow;
   type: ButtonType;
+  handleDelete?: (show: boolean) => void;
 }
 
 const ActionButton = (props: IProps) => {
-  const { show, type } = props;
-  const { addToShows, deleteShow, isShowAdded } = useStorage(show);
+  const { show, type, handleDelete } = props;
+  const { addToShows, isShowAdded } = useStorage(show);
+
+  const onDelete = () => {
+    handleDelete && handleDelete(true);
+  };
 
   const renderButton = () => {
     switch (type) {
@@ -35,7 +40,7 @@ const ActionButton = (props: IProps) => {
         return (
           <FontAwesomeIcon
             className="delete-button"
-            onClick={deleteShow}
+            onClick={onDelete}
             icon={faCircleXmark}
             size="lg"
           />

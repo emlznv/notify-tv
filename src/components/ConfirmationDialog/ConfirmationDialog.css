@@ -1,0 +1,29 @@
+.confirmation-dialog {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+}
+
+.dialog-buttons-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.dialog-confirm-button,
+.dialog-cancel-button {
+  cursor: pointer;
+}
+
+.dialog-confirm-button {
+  margin-right: 12px;
+  background-color: var(--color-button-added);
+  border-radius: 15px;
+  padding: 3px 12px;
+}
+
+.dialog-cancel-button {
+  border: none;
+  background: transparent;
+  color: var(--color-text-main);
+}
