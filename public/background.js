@@ -2,6 +2,7 @@
 /* eslint-disable no-undef */
 
 const updateDayFrequency = 1;
+const notificationDayRange = 1;
 
 const formatSeasonOrEpisode = (value) => {
   if (!value) { return; }
@@ -83,5 +84,9 @@ const notifyForNextEpisode = async () => {
 };
 
 chrome.runtime.onStartup.addListener(() => {
+  notifyForNextEpisode();
+});
+
+chrome.storage.onChanged.addListener(() => {
   notifyForNextEpisode();
 });
