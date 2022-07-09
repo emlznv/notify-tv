@@ -5,8 +5,7 @@
   text-align: left;
   align-items: flex-start;
   box-shadow: 0 4px 6px -4px var(--color-highlight-dark);
-  padding: 10px;
-  margin: 10px;
+  padding: 10px 12px;
 }
 
 .faded {
@@ -14,14 +13,14 @@
 }
 
 .show-poster-wrapper {
-  margin-top: 5px;
-  width: 50px;
+  margin-top: 6px;
+  width: 65px;
   height: fit-content;
 }
 
 .show-poster {
   width: 100%;
-  height: 55px;
+  height: 70px;
   border-radius: 6px;
   box-shadow: 4px 0px 13px var(--color-background-main);
 }
@@ -29,10 +28,6 @@
 .show-details {
   width: 100%;
   margin: 2px 0;
-}
-
-.premiere-date {
-  font-weight: normal;
 }
 
 .show-info {
@@ -46,21 +41,28 @@
   align-items: flex-start;
 }
 
+.show-network,
 .show-title {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  max-width: 185px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   overflow: hidden;
-  width: calc(100% - 30px);
 }
 
-.show-rating {
-  margin-right: 15px;
+.show-rating,
+.show-runtime {
+  margin-right: 11px;
 }
 
 .show-rating-icon,
-.show-runtime-icon {
+.show-runtime-icon,
+.show-next-episode-icon,
+.show-network-icon {
   margin-right: 5px;
+}
+
+.show-text-separator {
+  margin: 0 5px;
 }
 
 .show-rating-icon {
@@ -85,7 +87,8 @@
   transition: 0.3s;
 }
 
-.show-genres-wrapper {
+.show-genres-wrapper,
+.show-network-summary-wrapper {
   display: flex;
   justify-content: space-between;
   align-items: end;

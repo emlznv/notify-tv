@@ -2,7 +2,7 @@ const NO_RESULT_TEXT = 'n/a';
 const NO_SUMMARY_TEXT = 'No overview available.';
 
 export const formatPremiere = (value?: string) => {
-  return value ? ` (${value.substring(0, 4)})` : '';
+  return value ? `${value.substring(0, 4)}` : '';
 };
 
 export const formatRating = (rating: { average?: number }) => {
@@ -33,7 +33,18 @@ export const formatSummary = (summaryHtmlString?: string) => {
   if (!summaryHtmlString) { return NO_SUMMARY_TEXT; }
 
   const summary = parseHtmlString(summaryHtmlString);
-  const shortenedSummary = summary.split('. ').slice(0, 4).join('. ');
+  const shortenedSummary = summary.split('. ').slice(0, 3).join('. ');
   const endsWithDot = shortenedSummary[shortenedSummary.length - 1] === '.';
   return endsWithDot ? shortenedSummary : `${shortenedSummary}.`;
+};
+
+export const getDaysUntilNewEpisode = (episodeTimestamp: string) => {
+  const todayDate = new Date();
+  const newEpisodeDate = new Date(episodeTimestamp);
+
+  const differenceMs = newEpisodeDate.getTime() - todayDate.getTime();
+  const differenceDays = differenceMs / (1000 * 3600 * 24);
+
+  if (differenceDays < 1) { return 'Today'; }
+  return `${Math.ceil(differenceDays)} ${differenceDays > 1 ? 'days' : 'day'}`;
 };
