@@ -66,8 +66,9 @@ const shouldUpdateData = (lastUpdated) => {
 const notifyForNextEpisode = async () => {
   const { shows } = await chrome.storage.local.get('shows');
   const { lastUpdated } = await chrome.storage.local.get('lastUpdated');
+  const { lastNotified } = await chrome.storage.local.get('lastNotified');
 
-  if (!shows?.length) { return; }
+  if (!shows?.length || !shouldUpdateData(lastNotified)) { return; }
 
   shows.forEach(async (show) => {
     show = shouldUpdateData(lastUpdated) ? await getDataByUrl(show._links?.self?.href) : show;
@@ -79,14 +80,11 @@ const notifyForNextEpisode = async () => {
 
     if (!isWithinRange) { return; }
     createNotification({ data: upcomingEpisode, showName: show.name, image: show.image });
+    chrome.storage.local.set({ lastNotified: new Date().toISOString() });
   });
   chrome.storage.local.set({ shows });
 };
 
 chrome.runtime.onStartup.addListener(() => {
-  notifyForNextEpisode();
-});
-
-chrome.storage.onChanged.addListener(() => {
   notifyForNextEpisode();
 });
