@@ -2,15 +2,19 @@ import { useState } from 'react';
 import './ShowCard.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { faStar, faClock, faChevronDown, faChevronUp, faImage } from '@fortawesome/free-solid-svg-icons';
+import {
+  faStar, faClock, faChevronDown, faChevronUp, faImage, faFilm, faCalendarCheck
+} from '@fortawesome/free-solid-svg-icons';
 import { IShow } from '../../typescript/interfaces';
 import ActionButton from '../ActionButton/ActionButton';
 import {
-  formatAvgRuntime, formatGenres, formatPremiere, formatRating, formatSummary
+  formatAvgRuntime, formatGenres, formatPremiere, formatRating, formatSummary, getDaysUntilNewEpisode
 } from '../../helpers/format.helpers';
 import { ButtonType, Section } from '../../typescript/enums';
 import useStorage from '../../hooks/useStorage';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
+
+const separator = '\u2022';
 
 const ShowCard = ({ data, section }: { data: any; section: Section }) => {
   const show: IShow = data.show || data;
@@ -32,6 +36,8 @@ const ShowCard = ({ data, section }: { data: any; section: Section }) => {
   };
 
   const fadedClass = showDeleteConfirmation ? 'faded' : '';
+  const newEpisodeDays = (show.nextEpisodeData?.airstamp && getDaysUntilNewEpisode(show.nextEpisodeData.airstamp));
+  const network = show.network?.name || show.webChannel?.name;
 
   const onConfirmDelete = () => {
     deleteShow();
@@ -46,12 +52,14 @@ const ShowCard = ({ data, section }: { data: any; section: Section }) => {
         </div>
         <div className={`show-details ${fadedClass}`}>
           <div className="show-heading">
-            <h4 className="show-title">
-              {name}
-              <span className="premiere-date">{formatPremiere(premiered)}</span>
-            </h4>
+            <h4 className="show-title">{name}</h4>
             <ActionButton show={show} type={buttonType} handleDelete={setShowDeleteConfirmation} />
           </div>
+          <p>
+            {formatPremiere(premiered)}
+            <span className="show-text-separator">{separator}</span>
+            {formatGenres(genres)}
+          </p>
           <div className="show-info">
             <span className="show-rating">
               <FontAwesomeIcon
@@ -61,7 +69,7 @@ const ShowCard = ({ data, section }: { data: any; section: Section }) => {
               />
               {formatRating(rating)}
             </span>
-            <span>
+            <span className="show-runtime">
               <FontAwesomeIcon
                 className="show-runtime-icon"
                 icon={faClock}
@@ -69,9 +77,28 @@ const ShowCard = ({ data, section }: { data: any; section: Section }) => {
               />
               {formatAvgRuntime(averageRuntime)}
             </span>
+            {section === Section.addedShows && newEpisodeDays && (
+              <span>
+                <FontAwesomeIcon
+                  className="show-next-episode-icon"
+                  icon={faCalendarCheck}
+                  size="xs"
+                />
+                {newEpisodeDays}
+              </span>
+            )}
           </div>
-          <div className="show-genres-wrapper">
-            <p>{formatGenres(genres)}</p>
+          <div className="show-network-summary-wrapper">
+            {network && (
+              <span className="show-network">
+                <FontAwesomeIcon
+                  className="show-network-icon"
+                  icon={faFilm}
+                  size="xs"
+                />
+                {network}
+              </span>
+            )}
             <FontAwesomeIcon
               className="show-summary-button"
               icon={summaryIcon}
