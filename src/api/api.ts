@@ -11,3 +11,9 @@ export const getShowsBySearch = (searchTerm: string) => {
     ))
     .catch((err) => new Error(err));
 };
+
+export const getEpisode = (endpoint: string) => {
+  return fetch(endpoint)
+    .then((response) => response.json())
+    .catch((err) => new Error(err));
+};
