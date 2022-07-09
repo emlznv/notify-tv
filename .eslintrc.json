@@ -28,6 +28,7 @@
     "no-unused-expressions": "off",
     "object-curly-newline": "off",
     "no-shadow": "off",
+    "no-underscore-dangle": "off",
     "@typescript-eslint/no-shadow": ["error"],
     "react/function-component-definition": [
       "warn",

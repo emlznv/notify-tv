@@ -1,8 +1,9 @@
 import { faCircleXmark, faPlusCircle, faCircleCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import * as API from '../../api/api';
 import useStorage from '../../hooks/useStorage';
 import { ButtonType } from '../../typescript/enums';
-import { IShow } from '../../typescript/interfaces';
+import { IEpisode, IShow } from '../../typescript/interfaces';
 import './ActionButton.css';
 
 interface IProps {
@@ -19,6 +20,13 @@ const ActionButton = (props: IProps) => {
     handleDelete && handleDelete(true);
   };
 
+  const onAdd = async () => {
+    const nextEpisodeUrl = show?._links?.nextepisode?.href;
+    const nextEpisodeData: IEpisode = nextEpisodeUrl ? await API.getEpisode(nextEpisodeUrl) : undefined;
+    show.nextEpisodeData = nextEpisodeData;
+    addToShows();
+  };
+
   const renderButton = () => {
     switch (type) {
       case ButtonType.add:
@@ -32,7 +40,7 @@ const ActionButton = (props: IProps) => {
           <FontAwesomeIcon
             className="add-button"
             icon={faPlusCircle}
-            onClick={addToShows}
+            onClick={onAdd}
             size="lg"
           />
         );
