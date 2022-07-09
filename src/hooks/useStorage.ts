@@ -23,7 +23,7 @@ const useStorage = (show?: IShow) => {
 
   useEffect(() => {
     show && isShowAddedCheck();
-  }, [show]);
+  }, [show, addedShows]);
 
   const addToShows = async () => {
     if (!show) { return; }
