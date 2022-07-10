@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBell } from '@fortawesome/free-solid-svg-icons';
+import { faBell, faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
 
 import './Navigation.css';
 import { Section } from '../../typescript/enums';
@@ -7,10 +7,11 @@ import { Section } from '../../typescript/enums';
 interface IProps {
   activeSection: Section;
   onChangeSection: (section: Section) => void;
+  onShowSettingsMenu: () => void
 }
 
 const Navigation = (props: IProps) => {
-  const { activeSection, onChangeSection } = props;
+  const { activeSection, onChangeSection, onShowSettingsMenu } = props;
 
   const getActiveClass = (section: Section) => (activeSection === section ? 'active' : 'not-active');
   const handleSectionChange = (section: Section) => onChangeSection(section);
@@ -36,6 +37,11 @@ const Navigation = (props: IProps) => {
       >
         Explore
       </button>
+      <FontAwesomeIcon
+        className="settings-button"
+        icon={faEllipsisVertical}
+        onClick={onShowSettingsMenu}
+      />
     </div>
   );
 };

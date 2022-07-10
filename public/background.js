@@ -3,6 +3,7 @@
 
 const updateDayFrequency = 1;
 const notificationDayRange = 1;
+const defaultNotificationDays = ['0', '1'];
 
 const formatSeasonOrEpisode = (value) => {
   if (!value) { return; }
@@ -16,9 +17,26 @@ const formatMessage = (episode) => {
   return `${name} ${seasonAndEpisode}`;
 };
 
-const createNotification = ({ data, showName, image }) => {
+const getNotificationDayText = (day) => {
+  switch (day) {
+    case 0:
+      return 'today';
+    case 1:
+      return 'tomorrow';
+    case 3:
+      return 'in 3 days';
+    default:
+      break;
+  }
+};
+
+const setDefaultNotificationDays = async () => {
+  chrome.storage.local.set({ notificationDays: defaultNotificationDays });
+};
+
+const createNotification = ({ dayForNotification, data, showName, image }) => {
   const icon = image?.medium || './logo512.png';
-  const title = `${showName}: new episode today!`;
+  const title = `${showName}: new episode ${getNotificationDayText(dayForNotification)}!`;
 
   chrome.notifications.create('', {
     title,
@@ -33,14 +51,23 @@ const getDaysDifferenceBetweenDates = (futureDate, pastDate) => {
   return differenceMs / (1000 * 3600 * 24);
 };
 
-const checkEpisodeWithinRange = (episodeTimestamp, dayRange) => {
+const getNotificationDayForEpisode = (episodeTimestamp, notificationDays) => {
   if (!episodeTimestamp) { return; }
 
+  let notificationDay;
   const todayDate = new Date();
   const newEpisodeDate = new Date(episodeTimestamp);
 
   const differenceDays = getDaysDifferenceBetweenDates(newEpisodeDate, todayDate);
-  return differenceDays <= dayRange;
+  const differenceDaysRounded = differenceDays <= 1 ? Math.floor(differenceDays) : Math.ceil(differenceDays);
+
+  notificationDays.map((day) => Number(day)).forEach((day) => {
+    if (differenceDaysRounded === day) {
+      notificationDay = day;
+    }
+  });
+
+  return notificationDay;
 };
 
 const getDataByUrl = (url) => {
@@ -67,6 +94,7 @@ const notifyForNextEpisode = async () => {
   const { shows } = await chrome.storage.local.get('shows');
   const { lastUpdated } = await chrome.storage.local.get('lastUpdated');
   const { lastNotified } = await chrome.storage.local.get('lastNotified');
+  const { notificationDays } = await chrome.storage.local.get('notificationDays');
 
   if (!shows?.length || !shouldUpdateData(lastNotified)) { return; }
 
@@ -76,10 +104,10 @@ const notifyForNextEpisode = async () => {
       ? await getDataByUrl(show._links?.nextepisode?.href) : show.nextEpisodeData;
 
     const upcomingEpisode = show.nextEpisodeData;
-    const isWithinRange = checkEpisodeWithinRange(upcomingEpisode?.airstamp, notificationDayRange);
+    const dayForNotification = getNotificationDayForEpisode(upcomingEpisode?.airstamp, notificationDays);
 
-    if (!isWithinRange) { return; }
-    createNotification({ data: upcomingEpisode, showName: show.name, image: show.image });
+    if (dayForNotification === undefined) { return; }
+    createNotification({ dayForNotification, data: upcomingEpisode, showName: show.name, image: show.image });
     chrome.storage.local.set({ lastNotified: new Date().toISOString() });
   });
   chrome.storage.local.set({ shows });
@@ -87,4 +115,8 @@ const notifyForNextEpisode = async () => {
 
 chrome.runtime.onStartup.addListener(() => {
   notifyForNextEpisode();
+});
+
+chrome.runtime.onInstalled.addListener(() => {
+  setDefaultNotificationDays();
 });

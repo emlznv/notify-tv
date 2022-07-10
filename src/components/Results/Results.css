@@ -6,3 +6,7 @@
 .no-results-msg {
   padding: 20px;
 }
+
+.faded {
+  opacity: 0.05;
+}
