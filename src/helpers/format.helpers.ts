@@ -46,5 +46,5 @@ export const getDaysUntilNewEpisode = (episodeTimestamp: string) => {
   const differenceDays = differenceMs / (1000 * 3600 * 24);
 
   if (differenceDays < 1) { return 'Today'; }
-  return `${Math.ceil(differenceDays)} ${differenceDays > 1 ? 'days' : 'day'}`;
+  return `${Math.ceil(differenceDays)} ${Math.ceil(differenceDays) > 1 ? 'days' : 'day'}`;
 };

@@ -13,3 +13,9 @@ export enum ShowStatus {
   running = 'running',
   ended = 'ended'
 }
+
+export enum NotificationDay {
+  sameDay = '0',
+  oneDayBefore = '1',
+  threeDaysBefore = '3'
+}
