@@ -2,7 +2,7 @@ const NO_RESULT_TEXT = 'n/a';
 const NO_SUMMARY_TEXT = 'No overview available.';
 
 export const formatPremiere = (value?: string) => {
-  return value ? `${value.substring(0, 4)}` : '';
+  return value ? `${value.substring(0, 4)}` : NO_RESULT_TEXT;
 };
 
 export const formatRating = (rating: { average?: number }) => {

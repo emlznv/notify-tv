@@ -1,12 +1,32 @@
 .results-wrapper {
-  min-height: 100vh;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .no-results-msg {
-  padding: 20px;
+  text-align: center;
+  margin-top: 10rem;
+  padding: 0 20px;
 }
 
 .faded {
   opacity: 0.05;
+}
+
+.loading-spinner {
+  margin: 0 auto;
+  margin-top: 10rem;
+  border: 3px solid var(--color-highlight-dark);
+  border-top: 3px solid var(--color-highlight-light);
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
