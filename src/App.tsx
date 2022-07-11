@@ -12,7 +12,7 @@ const App = () => {
   const [activeSection, setActiveSection] = useState(Section.addedShows);
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   const { addedShows, getAddedShows } = useStorage();
-  const { searchResults, searchTerm, setSearchTerm } = useSearch();
+  const { searchResults, searchTerm, isLoading, setSearchTerm } = useSearch();
 
   const isSearchSection = activeSection === Section.search;
   const resultsData = isSearchSection ? searchResults : addedShows;
@@ -35,7 +35,7 @@ const App = () => {
           <SearchBar searchValue={searchTerm} onValueChange={setSearchTerm} />
         )}
       </div>
-      <Results fade={showSettingsMenu} results={resultsData} section={activeSection} />
+      <Results isLoading={isLoading} fade={showSettingsMenu} results={resultsData} section={activeSection} />
       {showSettingsMenu && <SettingsMenu />}
     </div>
   );
