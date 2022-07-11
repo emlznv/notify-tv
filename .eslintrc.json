@@ -13,6 +13,7 @@
     "sourceType": "module"
   },
   "plugins": ["react", "@typescript-eslint"],
+  "ignorePatterns": ["**/*.css"],
   "rules": {
     "max-len": ["error", 120],
     "semi": ["error", "always"],
@@ -28,6 +29,7 @@
     "no-unused-expressions": "off",
     "object-curly-newline": "off",
     "no-shadow": "off",
+    "no-underscore-dangle": "off",
     "@typescript-eslint/no-shadow": ["error"],
     "react/function-component-definition": [
       "warn",

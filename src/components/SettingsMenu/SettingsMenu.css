@@ -1,0 +1,42 @@
+.settings-menu {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: inherit;
+  box-shadow: 0 4px 6px -4px var(--color-highlight-dark);  
+}
+
+.settings-menu-title {
+  padding: 15px 5px;
+  box-shadow: 0 4px 6px -4px var(--color-highlight-light);
+}
+
+.settings-menu-list {
+  margin: 10px 0;
+}
+
+.settings-menu-item {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 10px 15px;
+  width: 100%;
+  border: none;
+  background-color: inherit;
+  color: inherit;
+}
+
+.settings-menu-item-icon-wrapper {
+  min-width: 22px;
+}
+
+.settings-menu-item-icon {
+  margin-right: 10px;
+  color: var(--color-button-added);
+}
+
+.settings-menu-item:hover {
+  background-color: var(--color-background-hover);
+  transition: 0.2s;
+}

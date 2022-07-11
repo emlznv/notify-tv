@@ -1,0 +1,33 @@
+.add-button,
+.added-button,
+.delete-button {
+  margin-top: 1px;
+  border-radius: 100%;
+}
+
+.add-button:hover {
+  box-shadow: 0px 0px 4px 2px var(--color-highlight-dark);
+  transition: 0.3s;
+}
+
+.delete-button:hover {
+  box-shadow: 0px 0px 4px 2px var(--color-highlight-light);
+  transition: 0.3s;
+}
+
+.add-button {
+  color: var(--color-button-add);
+}
+
+.added-button {
+  color: var(--color-button-added);
+}
+
+.delete-button {
+  color: var(--color-button-delete);
+}
+
+.add-button,
+.delete-button {
+  cursor: pointer;
+}

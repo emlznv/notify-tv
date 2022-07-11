@@ -2,12 +2,14 @@
   width: 100%;
   display: flex;
   justify-content: space-evenly;
-  padding: 10px;
+  align-items: center;
+  padding: 15px 5px;
   box-shadow: 0 1px 13px -4px;
   margin-bottom: 12px;
 }
 
 .navigation-button {
+  margin-left: auto;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -21,7 +23,8 @@
 }
 
 .navigation-button.not-active,
-.notify-icon.not-active {
+.notify-icon.not-active,
+.settings-button:hover {
   color: var(--color-text-secondary);
 }
 
@@ -32,4 +35,11 @@
 
 .notify-icon {
   margin-right: 10px;
+}
+
+.settings-button {
+  margin-left: auto;
+  padding: 0 10px;
+  cursor: pointer;
+  z-index: 10;
 }
