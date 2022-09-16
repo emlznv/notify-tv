@@ -30,11 +30,7 @@ const App = () => {
         onChangeSection={setActiveSection}
         onShowSettingsMenu={handleShowSettingsMenu}
       />
-      <div className="search-bar-wrapper">
-        {isSearchSection && (
-          <SearchBar searchValue={searchTerm} onValueChange={setSearchTerm} />
-        )}
-      </div>
+      {isSearchSection && <SearchBar searchValue={searchTerm} onValueChange={setSearchTerm} />}
       <Results isLoading={isLoading} fade={showSettingsMenu} results={resultsData} section={activeSection} />
       {showSettingsMenu && <SettingsMenu />}
     </div>

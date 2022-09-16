@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './ShowCard.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -28,6 +28,11 @@ const ShowCard = ({ data, section }: { data: any; section: Section }) => {
   const handleShowSummary = () => setShowSummary(!showSummary);
   const summaryIcon = showSummary ? faChevronUp : faChevronDown;
 
+  useEffect(() => {
+    setShowSummary(false);
+    setShowDeleteConfirmation(false);
+  }, [section]);
+
   const getPoster = () => {
     const imageSrc = image?.medium;
     return imageSrc
@@ -55,7 +60,7 @@ const ShowCard = ({ data, section }: { data: any; section: Section }) => {
             <h4 className="show-title">{name}</h4>
             <ActionButton show={show} type={buttonType} handleDelete={setShowDeleteConfirmation} />
           </div>
-          <p>
+          <p className="show-premiere-genres">
             {formatPremiere(premiered)}
             <span className="show-text-separator">{separator}</span>
             {formatGenres(genres)}

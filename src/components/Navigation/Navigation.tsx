@@ -28,7 +28,7 @@ const Navigation = (props: IProps) => {
           icon={faBell}
           size="sm"
         />
-        Notify List
+        My List
       </button>
       <button
         type="button"

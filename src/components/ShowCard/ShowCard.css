@@ -36,6 +36,7 @@
 }
 
 .show-heading {
+  margin-bottom: 2px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -44,6 +45,15 @@
 .show-network,
 .show-title {
   max-width: 185px;
+}
+
+.show-premiere-genres {
+  max-width: 195px;
+}
+
+.show-network,
+.show-title,
+.show-premiere-genres {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
