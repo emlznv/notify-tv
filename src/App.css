@@ -9,11 +9,6 @@
   align-items: center;
 }
 
-.search-bar-wrapper {
-  height: 25px;
-  width: 85%;
-}
-
 ::-webkit-scrollbar {
   width: 3px;
 }

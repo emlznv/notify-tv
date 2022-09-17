@@ -1,9 +1,10 @@
 import { faCircleXmark, faPlusCircle, faCircleCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import * as API from '../../api/api';
-import useStorage from '../../hooks/useStorage';
+import { StorageContext } from '../../context/storage-context';
 import { ButtonType } from '../../typescript/enums';
-import { IEpisode, IShow } from '../../typescript/interfaces';
+import { IEpisode, IShow, IStorageContext } from '../../typescript/interfaces';
 import './ActionButton.css';
 
 interface IProps {
@@ -14,7 +15,13 @@ interface IProps {
 
 const ActionButton = (props: IProps) => {
   const { show, type, handleDelete } = props;
-  const { addToShows, isShowAdded } = useStorage(show);
+  const [isShowAdded, setIsShowAdded] = useState<boolean>(false);
+  const { addedShows, addToShows } = useContext(StorageContext) as IStorageContext;
+
+  useEffect(() => {
+    const existingShow = addedShows.find((item: IShow) => item.id === show.id);
+    setIsShowAdded(!!existingShow);
+  }, []);
 
   const onDelete = () => {
     handleDelete && handleDelete(true);
@@ -24,7 +31,8 @@ const ActionButton = (props: IProps) => {
     const nextEpisodeUrl = show?._links?.nextepisode?.href;
     const nextEpisodeData: IEpisode = nextEpisodeUrl ? await API.getEpisode(nextEpisodeUrl) : undefined;
     show.nextEpisodeData = nextEpisodeData;
-    addToShows();
+    setIsShowAdded(true);
+    addToShows(show);
   };
 
   const renderButton = () => {

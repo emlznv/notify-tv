@@ -8,6 +8,7 @@
 }
 
 .settings-menu-title {
+  font-weight: normal;
   padding: 15px 5px;
   box-shadow: 0 4px 6px -4px var(--color-highlight-light);
 }

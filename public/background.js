@@ -1,8 +1,7 @@
-/* eslint-disable no-param-reassign */
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-undef */
 
-const updateDayFrequency = 1;
-const notificationDayRange = 1;
+const updateDayFrequency = 0.5;
 const defaultNotificationDays = ['0', '1'];
 
 const formatSeasonOrEpisode = (value) => {
@@ -28,6 +27,12 @@ const getNotificationDayText = (day) => {
     default:
       break;
   }
+};
+
+const addDays = (date, days) => {
+  const result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
 };
 
 const setDefaultNotificationDays = async () => {
@@ -58,13 +63,9 @@ const getNotificationDayForEpisode = (episodeTimestamp, notificationDays) => {
   const todayDate = new Date();
   const newEpisodeDate = new Date(episodeTimestamp);
 
-  const differenceDays = getDaysDifferenceBetweenDates(newEpisodeDate, todayDate);
-  const differenceDaysRounded = differenceDays <= 1 ? Math.floor(differenceDays) : Math.ceil(differenceDays);
-
   notificationDays.map((day) => Number(day)).forEach((day) => {
-    if (differenceDaysRounded === day) {
-      notificationDay = day;
-    }
+    const notificationDate = addDays(todayDate, day);
+    if (notificationDate.getDate() === newEpisodeDate.getDate()) { notificationDay = day; }
   });
 
   return notificationDay;
@@ -98,18 +99,21 @@ const notifyForNextEpisode = async () => {
 
   if (!shows?.length || !shouldUpdateData(lastNotified)) { return; }
 
-  shows.forEach(async (show) => {
-    show = shouldUpdateData(lastUpdated) ? await getDataByUrl(show._links?.self?.href) : show;
-    show.nextEpisodeData = shouldUpdateData(lastUpdated)
-      ? await getDataByUrl(show._links?.nextepisode?.href) : show.nextEpisodeData;
+  for (const show of shows) {
+    if (shouldUpdateData(lastUpdated)) {
+      const index = shows.indexOf(show);
+      const updatedShow = await getDataByUrl(show._links?.self?.href);
+      shows[index] = updatedShow;
+      shows[index].nextEpisodeData = await getDataByUrl(updatedShow._links?.nextepisode?.href);
+    }
 
-    const upcomingEpisode = show.nextEpisodeData;
-    const dayForNotification = getNotificationDayForEpisode(upcomingEpisode?.airstamp, notificationDays);
+    const dayForNotification = getNotificationDayForEpisode(show.nextEpisodeData?.airstamp, notificationDays);
 
-    if (dayForNotification === undefined) { return; }
-    createNotification({ dayForNotification, data: upcomingEpisode, showName: show.name, image: show.image });
-    chrome.storage.local.set({ lastNotified: new Date().toISOString() });
-  });
+    if (dayForNotification !== undefined) {
+      createNotification({ dayForNotification, data: show.nextEpisodeData, showName: show.name, image: show.image });
+      chrome.storage.local.set({ lastNotified: new Date().toISOString() });
+    }
+  }
   chrome.storage.local.set({ shows });
 };
 
