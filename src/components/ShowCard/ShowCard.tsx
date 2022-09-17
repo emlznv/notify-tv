@@ -1,18 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import './ShowCard.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import {
   faStar, faClock, faChevronDown, faChevronUp, faImage, faFilm, faCalendarCheck
 } from '@fortawesome/free-solid-svg-icons';
-import { IShow } from '../../typescript/interfaces';
+import { IShow, IStorageContext } from '../../typescript/interfaces';
 import ActionButton from '../ActionButton/ActionButton';
 import {
   formatAvgRuntime, formatGenres, formatPremiere, formatRating, formatSummary, getDaysUntilNewEpisode
-} from '../../helpers/format.helpers';
+} from '../../helpers/format-helpers';
 import { ButtonType, Section } from '../../typescript/enums';
-import useStorage from '../../hooks/useStorage';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
+import { StorageContext } from '../../context/storage-context';
 
 const separator = '\u2022';
 
@@ -22,7 +22,7 @@ const ShowCard = ({ data, section }: { data: any; section: Section }) => {
   const buttonType = section === Section.addedShows ? ButtonType.delete : ButtonType.add;
 
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState<boolean>(false);
-  const { deleteShow } = useStorage(show);
+  const { deleteShow } = useContext(StorageContext) as IStorageContext;
 
   const [showSummary, setShowSummary] = useState<boolean>(false);
   const handleShowSummary = () => setShowSummary(!showSummary);
@@ -45,7 +45,7 @@ const ShowCard = ({ data, section }: { data: any; section: Section }) => {
   const network = show.network?.name || show.webChannel?.name;
 
   const onConfirmDelete = () => {
-    deleteShow();
+    deleteShow(show);
     setShowDeleteConfirmation(false);
   };
 

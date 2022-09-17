@@ -1,38 +1,47 @@
-import { useEffect, useState } from 'react';
+import { ReactNode, useState } from 'react';
 import './App.css';
 import Navigation from './components/Navigation/Navigation';
 import Results from './components/Results/Results';
 import SearchBar from './components/SearchBar/SearchBar';
 import SettingsMenu from './components/SettingsMenu/SettingsMenu';
+import { StorageContext } from './context/storage-context';
 import useSearch from './hooks/useSearch';
 import useStorage from './hooks/useStorage';
 import { Section } from './typescript/enums';
+import { IStorageContext } from './typescript/interfaces';
+
+const StorageContextProvider = ({ children, storage }: { children: ReactNode[], storage: IStorageContext}) => {
+  return (
+    <StorageContext.Provider value={storage}>
+      {children}
+    </StorageContext.Provider>
+  );
+};
 
 const App = () => {
-  const [activeSection, setActiveSection] = useState(Section.addedShows);
-  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
-  const { addedShows, getAddedShows } = useStorage();
+  const storage = useStorage();
   const { searchResults, searchTerm, isLoading, setSearchTerm } = useSearch();
 
-  const isSearchSection = activeSection === Section.search;
-  const resultsData = isSearchSection ? searchResults : addedShows;
+  const [activeSection, setActiveSection] = useState(Section.addedShows);
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
 
-  useEffect(() => {
-    getAddedShows();
-  }, [addedShows, getAddedShows]);
+  const isSearchSection = activeSection === Section.search;
+  const resultsData = isSearchSection ? searchResults : storage.addedShows;
 
   const handleShowSettingsMenu = () => setShowSettingsMenu(!showSettingsMenu);
 
   return (
     <div className="app">
-      <Navigation
-        activeSection={activeSection}
-        onChangeSection={setActiveSection}
-        onShowSettingsMenu={handleShowSettingsMenu}
-      />
-      {isSearchSection && <SearchBar searchValue={searchTerm} onValueChange={setSearchTerm} />}
-      <Results isLoading={isLoading} fade={showSettingsMenu} results={resultsData} section={activeSection} />
-      {showSettingsMenu && <SettingsMenu />}
+      <StorageContextProvider storage={storage}>
+        <Navigation
+          activeSection={activeSection}
+          onChangeSection={setActiveSection}
+          onShowSettingsMenu={handleShowSettingsMenu}
+        />
+        {isSearchSection && <SearchBar searchValue={searchTerm} onValueChange={setSearchTerm} />}
+        <Results isLoading={isLoading} fade={showSettingsMenu} results={resultsData} section={activeSection} />
+        {showSettingsMenu && <SettingsMenu />}
+      </StorageContextProvider>
     </div>
   );
 };

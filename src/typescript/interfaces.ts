@@ -43,3 +43,9 @@ export interface IShowResponse {
   score: number;
   show: IShow;
 }
+
+export interface IStorageContext {
+  addedShows: IShow[]
+  addToShows: (show: IShow) => void
+  deleteShow: (show: IShow) => void
+}
