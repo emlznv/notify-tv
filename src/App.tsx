@@ -20,7 +20,7 @@ const StorageContextProvider = ({ children, storage }: { children: ReactNode[], 
 
 const App = () => {
   const storage = useStorage();
-  const { searchResults, searchTerm, isLoading, setSearchTerm, clearSearch } = useSearch();
+  const { searchResults, searchTerm, isLoading, error, setSearchTerm, clearSearch } = useSearch();
 
   const [activeSection, setActiveSection] = useState(Section.addedShows);
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
@@ -43,7 +43,13 @@ const App = () => {
           onShowSettingsMenu={handleShowSettingsMenu}
         />
         {isSearchSection && <SearchBar searchValue={searchTerm} onValueChange={setSearchTerm} />}
-        <Results isLoading={isLoading} fade={showSettingsMenu} results={resultsData} section={activeSection} />
+        <Results
+          isLoading={isLoading}
+          error={error}
+          fade={showSettingsMenu}
+          results={resultsData}
+          section={activeSection}
+        />
         {showSettingsMenu && <SettingsMenu />}
       </StorageContextProvider>
     </div>

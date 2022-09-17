@@ -1,3 +1,5 @@
+import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Section } from '../../typescript/enums';
 import { IShow, IShowResponse } from '../../typescript/interfaces';
 import ShowCard from '../ShowCard/ShowCard';
@@ -8,14 +10,17 @@ interface IProps {
   results: IShow[] | IShowResponse[];
   section: Section;
   fade: boolean;
+  error: boolean;
 }
 
 const NO_SHOWS_ADDED_MSG = 'Add shows to get notified for new episodes.';
 const NO_RESULTS_FOUND_MSG = 'No results to show.';
+const ERROR_MSG = 'An error occured. Please try again.';
 
 const Results = (props: IProps) => {
-  const { results, section, fade, isLoading } = props;
+  const { results, section, fade, isLoading, error } = props;
   const fadedClass = fade ? 'faded' : '';
+  const searchResultsMsg = error ? ERROR_MSG : NO_RESULTS_FOUND_MSG;
 
   const renderResults = () => {
     if (isLoading) { return <div className="loading-spinner" />; }
@@ -26,7 +31,8 @@ const Results = (props: IProps) => {
       ))
     ) : (
       <p className={`no-results-msg ${fadedClass}`}>
-        {section === Section.addedShows ? NO_SHOWS_ADDED_MSG : NO_RESULTS_FOUND_MSG}
+        {error && <FontAwesomeIcon className="error-icon" icon={faCircleExclamation} size="lg" />}
+        {section === Section.addedShows ? NO_SHOWS_ADDED_MSG : searchResultsMsg}
       </p>
     );
   };
