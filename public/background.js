@@ -1,4 +1,4 @@
-/* eslint-disable no-param-reassign */
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-undef */
 
 const updateDayFrequency = 0.5;
@@ -91,14 +91,6 @@ const shouldUpdateData = (lastUpdated) => {
   return differenceDays >= updateDayFrequency;
 };
 
-const getShowAndNextEpisodeData = async (lastUpdated, show) => {
-  return {
-    showData: shouldUpdateData(lastUpdated) ? await getDataByUrl(show._links?.self?.href) : show,
-    nextEpisodeData: shouldUpdateData(lastUpdated)
-      ? await getDataByUrl(show._links?.nextepisode?.href) : show.nextEpisodeData
-  };
-};
-
 const notifyForNextEpisode = async () => {
   const { shows } = await chrome.storage.local.get('shows');
   const { lastUpdated } = await chrome.storage.local.get('lastUpdated');
@@ -107,17 +99,21 @@ const notifyForNextEpisode = async () => {
 
   if (!shows?.length || !shouldUpdateData(lastNotified)) { return; }
 
-  shows.forEach(async (show, index) => {
-    const { showData, nextEpisodeData } = await getShowAndNextEpisodeData(lastUpdated, show);
-    shows[index] = showData;
-    shows[index].nextEpisodeData = nextEpisodeData;
+  for (const show of shows) {
+    if (shouldUpdateData(lastUpdated)) {
+      const index = shows.indexOf(show);
+      const updatedShow = await getDataByUrl(show._links?.self?.href);
+      shows[index] = updatedShow;
+      shows[index].nextEpisodeData = await getDataByUrl(updatedShow._links?.nextepisode?.href);
+    }
 
-    const dayForNotification = getNotificationDayForEpisode(nextEpisodeData?.airstamp, notificationDays);
-    if (dayForNotification === undefined) { return; }
+    const dayForNotification = getNotificationDayForEpisode(show.nextEpisodeData?.airstamp, notificationDays);
 
-    createNotification({ dayForNotification, data: nextEpisodeData, showName: show.name, image: show.image });
-    chrome.storage.local.set({ lastNotified: new Date().toISOString() });
-  });
+    if (dayForNotification !== undefined) {
+      createNotification({ dayForNotification, data: show.nextEpisodeData, showName: show.name, image: show.image });
+      chrome.storage.local.set({ lastNotified: new Date().toISOString() });
+    }
+  }
   chrome.storage.local.set({ shows });
 };
 
