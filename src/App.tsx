@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import './App.css';
 import Navigation from './components/Navigation/Navigation';
 import Results from './components/Results/Results';
@@ -20,13 +20,17 @@ const StorageContextProvider = ({ children, storage }: { children: ReactNode[], 
 
 const App = () => {
   const storage = useStorage();
-  const { searchResults, searchTerm, isLoading, setSearchTerm } = useSearch();
+  const { searchResults, searchTerm, isLoading, setSearchTerm, clearSearch } = useSearch();
 
   const [activeSection, setActiveSection] = useState(Section.addedShows);
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
 
   const isSearchSection = activeSection === Section.search;
   const resultsData = isSearchSection ? searchResults : storage.addedShows;
+
+  useEffect(() => {
+    !isSearchSection && clearSearch();
+  }, [activeSection]);
 
   const handleShowSettingsMenu = () => setShowSettingsMenu(!showSettingsMenu);
 

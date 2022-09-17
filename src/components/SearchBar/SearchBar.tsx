@@ -17,6 +17,7 @@ const SearchBar = (props: IProps) => {
         onChange={(e: React.FormEvent<HTMLInputElement>) => onValueChange(e.currentTarget.value)}
         placeholder="Westworld"
         value={searchValue}
+        autoFocus
       />
       <FontAwesomeIcon className="search-icon" icon={faSearch} size="sm" />
     </div>

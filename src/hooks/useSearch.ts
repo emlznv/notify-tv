@@ -22,11 +22,17 @@ const useSearch = () => {
     return () => clearTimeout(executeSearch);
   }, [searchTerm, setSearchTerm]);
 
+  const clearSearch = () => {
+    setSearchTerm('');
+    setSearchResults([]);
+  };
+
   return {
     isLoading,
     searchTerm,
     searchResults,
     setSearchTerm,
+    clearSearch
   };
 };
 
