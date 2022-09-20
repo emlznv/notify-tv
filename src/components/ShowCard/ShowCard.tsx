@@ -1,11 +1,11 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import './ShowCard.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import {
   faStar, faClock, faChevronDown, faChevronUp, faImage, faFilm, faCalendarCheck
 } from '@fortawesome/free-solid-svg-icons';
-import { IShow, IStorageContext } from '../../typescript/interfaces';
+import { IShow, IShowResponse, IStorageContext } from '../../typescript/interfaces';
 import ActionButton from '../ActionButton/ActionButton';
 import {
   formatAvgRuntime, formatGenres, formatPremiere, formatRating, formatSummary, getDaysUntilNewEpisode
@@ -14,10 +14,16 @@ import { ButtonType, Section } from '../../typescript/enums';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
 import { StorageContext } from '../../context/storage-context';
 
-const separator = '\u2022';
+const SEPARATOR = '\u2022';
 
-const ShowCard = ({ data, section }: { data: any; section: Section }) => {
-  const show: IShow = data.show || data;
+interface IProps {
+  data: IShow | IShowResponse
+  section: Section
+}
+
+const ShowCard = (props: IProps) => {
+  const { section, data } = props;
+  const show: IShow = (data as IShowResponse).show || data;
   const { name, image, genres, averageRuntime, rating, premiered, summary } = show;
   const buttonType = section === Section.addedShows ? ButtonType.delete : ButtonType.add;
 
@@ -25,6 +31,26 @@ const ShowCard = ({ data, section }: { data: any; section: Section }) => {
   const { deleteShow } = useContext(StorageContext) as IStorageContext;
 
   const [showSummary, setShowSummary] = useState<boolean>(false);
+  const [isSummaryRefAvailable, setIsSummaryRefAvailable] = useState<boolean>(false);
+  const summaryRef = useRef<HTMLParagraphElement | null>(null);
+
+  const scrollSummaryIntoView = () => {
+    const isElementHidden = summaryRef?.current
+      && summaryRef.current.getBoundingClientRect().bottom > window.innerHeight;
+    if (isElementHidden) {
+      summaryRef?.current?.scrollIntoView({ block: 'end', inline: 'nearest', behavior: 'smooth' });
+    }
+  };
+
+  const handleCurrentSummaryRef = (el: HTMLParagraphElement | null) => {
+    summaryRef.current = el;
+    setIsSummaryRefAvailable(!!el);
+  };
+
+  useEffect(() => {
+    isSummaryRefAvailable && scrollSummaryIntoView();
+  }, [isSummaryRefAvailable]);
+
   const handleShowSummary = () => setShowSummary(!showSummary);
   const summaryIcon = showSummary ? faChevronUp : faChevronDown;
 
@@ -62,7 +88,7 @@ const ShowCard = ({ data, section }: { data: any; section: Section }) => {
           </div>
           <p className="show-premiere-genres">
             {formatPremiere(premiered)}
-            <span className="show-text-separator">{separator}</span>
+            <span className="show-text-separator">{SEPARATOR}</span>
             {formatGenres(genres)}
           </p>
           <div className="show-info">
@@ -112,7 +138,9 @@ const ShowCard = ({ data, section }: { data: any; section: Section }) => {
             />
           </div>
           {showSummary && (
-            <p className="show-summary">{formatSummary(summary)}</p>
+            <p className="show-summary" ref={(el) => handleCurrentSummaryRef(el)}>
+              {formatSummary(summary)}
+            </p>
           )}
         </div>
         <ConfirmationDialog
