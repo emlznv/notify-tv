@@ -1,0 +1,9 @@
+.settings-button {
+  margin-left: auto;
+  padding: 0 10px;
+  cursor: pointer;
+}
+
+.settings-button:hover {
+  color: var(--color-text-secondary);
+}
