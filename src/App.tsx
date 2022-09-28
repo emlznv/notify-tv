@@ -50,7 +50,7 @@ const App = () => {
           results={resultsData}
           section={activeSection}
         />
-        {showSettingsMenu && <SettingsMenu />}
+        {showSettingsMenu && <SettingsMenu onShowSettingsMenu={handleShowSettingsMenu} />}
       </StorageContextProvider>
     </div>
   );
