@@ -103,8 +103,12 @@ const notifyForNextEpisode = async () => {
     if (shouldUpdateData(lastUpdated)) {
       const index = shows.indexOf(show);
       const updatedShow = await getDataByUrl(show._links?.self?.href);
-      shows[index] = updatedShow;
-      shows[index].nextEpisodeData = await getDataByUrl(updatedShow._links?.nextepisode?.href);
+      const updatedShowSuccess = !(updatedShow instanceof Error);
+      if (updatedShowSuccess) {
+        shows[index] = updatedShow;
+        const updatedNextEpisodeData = await getDataByUrl(updatedShow._links?.nextepisode?.href);
+        if (!(updatedNextEpisodeData instanceof Error)) { shows[index].nextEpisodeData = updatedNextEpisodeData; }
+      }
     }
 
     const dayForNotification = getNotificationDayForEpisode(show.nextEpisodeData?.airstamp, notificationDays);

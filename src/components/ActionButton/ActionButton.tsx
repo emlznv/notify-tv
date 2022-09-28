@@ -30,7 +30,8 @@ const ActionButton = (props: IProps) => {
   const onAdd = async () => {
     const nextEpisodeUrl = show?._links?.nextepisode?.href;
     const nextEpisodeData: IEpisode = nextEpisodeUrl ? await API.getEpisode(nextEpisodeUrl) : undefined;
-    show.nextEpisodeData = nextEpisodeData;
+    const nextEpisodeDataSuccess = !(nextEpisodeData instanceof Error);
+    if (nextEpisodeDataSuccess) { show.nextEpisodeData = nextEpisodeData; }
     setIsShowAdded(true);
     addToShows(show);
   };
