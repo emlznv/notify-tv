@@ -64,6 +64,10 @@
   margin-right: 11px;
 }
 
+.show-next-episode-icon {
+  color: var(--color-icon-calendar);
+}
+
 .show-rating-icon,
 .show-runtime-icon,
 .show-next-episode-icon,
@@ -89,7 +93,7 @@
 }
 
 .show-summary-button {
-  color: var(--color-text-main);
+  color: var(--color-icon-details);
   cursor: pointer;
 }
 
