@@ -31,3 +31,13 @@
 .delete-button {
   cursor: pointer;
 }
+
+@media (prefers-color-scheme: light) {
+  .add-button:hover {
+    box-shadow: 0px 0px 4px 2px var(--color-faded);
+  }
+  
+  .delete-button:hover {
+    box-shadow: 0px 0px 4px 2px var(--color-faded);
+  }
+}

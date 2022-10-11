@@ -10,7 +10,27 @@
   --color-button-added: #90ee90;
   --color-button-delete: #808080;
   --color-icon-rating: #ffa500;
+  --color-icon-bell: #ffa500;
   --color-icon-runtime: #ffffff;
+  --color-icon-calendar: #ffffff;
+  --color-icon-details: #ffffff;
   --color-faded: #808080;
   --color-error: #ffa6a6;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-background-main: #fbfbfb;
+    --color-background-nav: #ededed;
+    --color-background-hover: #e6e6e6;
+    --color-text-main: #000000;
+    --color-text-secondary: #939393;
+    --color-icon-runtime: #939393;
+    --color-icon-calendar: #939393;
+    --color-icon-details: #939393;
+    --color-button-add: #7ac7e1;
+    --color-button-added: #37c537;
+    --color-button-delete: #d1d1d1;
+    --color-faded: #a7a7a7;
+  }
 }

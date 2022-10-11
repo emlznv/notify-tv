@@ -40,3 +40,9 @@
 .notify-icon {
   margin-right: 10px;
 }
+
+@media (prefers-color-scheme: light) {
+  .notify-icon.active {
+    color: var(--color-icon-bell);
+  }
+}
