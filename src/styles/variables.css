@@ -16,6 +16,7 @@
   --color-icon-details: #ffffff;
   --color-faded: #808080;
   --color-error: #ffa6a6;
+  --color-link-external: #5d94f7;
 }
 
 @media (prefers-color-scheme: light) {

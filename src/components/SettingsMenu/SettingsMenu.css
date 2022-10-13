@@ -51,3 +51,14 @@
   background-color: var(--color-background-hover);
   transition: 0.2s;
 }
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  margin-bottom: 8px;
+  font-size: 11px;
+}
+
+.credit-link {
+  color: var(--color-link-external);
+}
