@@ -15,7 +15,7 @@ const SearchBar = (props: IProps) => {
       <input
         className="search-input"
         onChange={(e: React.FormEvent<HTMLInputElement>) => onValueChange(e.currentTarget.value)}
-        placeholder="Westworld"
+        placeholder="Search for an ongoing show"
         value={searchValue}
         autoFocus
       />
