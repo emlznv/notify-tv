@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 /* eslint-disable no-undef */
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -91,7 +90,14 @@ const SettingsMenu = (props: IProps) => {
           {' '}
           licensed by
           {' '}
-          <a className="credit-link" href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noreferrer">CC BY-SA</a>
+          <a
+            className="credit-link"
+            href="https://creativecommons.org/licenses/by-sa/4.0/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            CC BY-SA
+          </a>
         </p>
       </footer>
     </>
