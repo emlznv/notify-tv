@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable no-undef */
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -53,34 +54,47 @@ const SettingsMenu = (props: IProps) => {
   ];
 
   return (
-    <div className="settings-menu">
-      <div className="settings-menu-header">
-        <h4 className="settings-menu-title">Receive episode notification</h4>
-        <span className="settings-menu-button"><SettingsButton onShowSettingsMenu={onShowSettingsMenu} /></span>
+    <>
+      <div className="settings-menu">
+        <div className="settings-menu-header">
+          <h4 className="settings-menu-title">Receive episode notification</h4>
+          <span className="settings-menu-button"><SettingsButton onShowSettingsMenu={onShowSettingsMenu} /></span>
+        </div>
+        <ul className="settings-menu-list">
+          {items.map((item) => (
+            <li>
+              <button
+                className="settings-menu-item"
+                type="button"
+                onClick={() => updateNotificationDays(item.day)}
+              >
+                <span className="settings-menu-item-icon-wrapper">
+                  {item.isChecked
+                  && (
+                    <FontAwesomeIcon
+                      icon={faCheck}
+                      className="settings-menu-item-icon"
+                    />
+                  )}
+                </span>
+                <span>{item.text}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
-      <ul className="settings-menu-list">
-        {items.map((item) => (
-          <li>
-            <button
-              className="settings-menu-item"
-              type="button"
-              onClick={() => updateNotificationDays(item.day)}
-            >
-              <span className="settings-menu-item-icon-wrapper">
-                {item.isChecked
-                && (
-                <FontAwesomeIcon
-                  icon={faCheck}
-                  className="settings-menu-item-icon"
-                />
-                )}
-              </span>
-              <span>{item.text}</span>
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
+      <footer className="footer">
+        <p>
+          This extension uses
+          {' '}
+          <a className="credit-link" href="https://www.tvmaze.com/" target="_blank" rel="noreferrer">TV Maze API</a>
+          {' '}
+          licensed by
+          {' '}
+          <a className="credit-link" href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noreferrer">CC BY-SA</a>
+        </p>
+      </footer>
+    </>
   );
 };
 
