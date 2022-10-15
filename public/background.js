@@ -2,7 +2,7 @@
 /* eslint-disable no-undef */
 
 const updateDayFrequency = 0.5;
-const defaultNotificationDays = ['0', '1'];
+const defaultNotificationDays = ['0'];
 
 const formatSeasonOrEpisode = (value) => {
   if (!value) { return; }
@@ -40,7 +40,7 @@ const setDefaultNotificationDays = async () => {
 };
 
 const createNotification = ({ dayForNotification, data, showName, image }) => {
-  const icon = image?.medium || './logo512.png';
+  const icon = image?.medium || './logo.png';
   const title = `${showName}: new episode ${getNotificationDayText(dayForNotification)}!`;
 
   chrome.notifications.create('', {
@@ -65,10 +65,22 @@ const getNotificationDayForEpisode = (episodeTimestamp, notificationDays) => {
 
   notificationDays.map((day) => Number(day)).forEach((day) => {
     const notificationDate = addDays(todayDate, day);
-    if (notificationDate.getDate() === newEpisodeDate.getDate()) { notificationDay = day; }
+    const datesMatch = notificationDate.getDate() === newEpisodeDate.getDate()
+      && notificationDate.getMonth() === newEpisodeDate.getMonth();
+
+    if (datesMatch) { notificationDay = day; }
   });
 
   return notificationDay;
+};
+
+const isEpisodeToday = (date) => {
+  if (!date) { return false; }
+  const todayDate = new Date();
+  const epDate = new Date(date);
+  const datesMatch = todayDate.getDate() === epDate.getDate()
+  && todayDate.getMonth() === epDate.getMonth();
+  return datesMatch;
 };
 
 const getDataByUrl = (url) => {
@@ -91,33 +103,42 @@ const shouldUpdateData = (lastUpdated) => {
   return differenceDays >= updateDayFrequency;
 };
 
-const notifyForNextEpisode = async () => {
-  const { shows } = await chrome.storage.local.get('shows');
-  const { lastUpdated } = await chrome.storage.local.get('lastUpdated');
-  const { lastNotified } = await chrome.storage.local.get('lastNotified');
-  const { notificationDays } = await chrome.storage.local.get('notificationDays');
-
-  if (!shows?.length || !shouldUpdateData(lastNotified)) { return; }
-
+const updateShowsData = async (shows) => {
+  const updatedShows = [];
   for (const show of shows) {
-    if (shouldUpdateData(lastUpdated)) {
-      const index = shows.indexOf(show);
+    if (isEpisodeToday(show.nextEpisodeData?.airstamp)) {
+      updatedShows.push(show);
+    } else {
       const updatedShow = await getDataByUrl(show._links?.self?.href);
       const updatedShowSuccess = !(updatedShow instanceof Error);
       if (updatedShowSuccess) {
-        shows[index] = updatedShow;
         const updatedNextEpisodeData = await getDataByUrl(updatedShow._links?.nextepisode?.href);
-        if (!(updatedNextEpisodeData instanceof Error)) { shows[index].nextEpisodeData = updatedNextEpisodeData; }
+        if (!(updatedNextEpisodeData instanceof Error)) { updatedShow.nextEpisodeData = updatedNextEpisodeData; }
+        updatedShows.push(updatedShow);
       }
     }
+  }
+  return updatedShows;
+};
 
+const notifyForNextEpisode = async () => {
+  let { shows } = await chrome.storage.local.get('shows');
+  const { lastUpdated } = await chrome.storage.local.get('lastUpdated');
+  const { lastNotified } = await chrome.storage.local.get('lastNotified');
+  const { notificationDays } = await chrome.storage.local.get('notificationDays');
+  const shouldNotify = shouldUpdateData(lastNotified);
+
+  if (!shows?.length || !shouldNotify) { return; }
+  shows = shouldUpdateData(lastUpdated) ? await updateShowsData(shows) : shows;
+
+  shows.forEach((show) => {
     const dayForNotification = getNotificationDayForEpisode(show.nextEpisodeData?.airstamp, notificationDays);
 
     if (dayForNotification !== undefined) {
       createNotification({ dayForNotification, data: show.nextEpisodeData, showName: show.name, image: show.image });
       chrome.storage.local.set({ lastNotified: new Date().toISOString() });
     }
-  }
+  });
   chrome.storage.local.set({ shows });
 };
 

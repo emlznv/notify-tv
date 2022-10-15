@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import * as API from '../../api/api';
 import { StorageContext } from '../../context/storage-context';
+import { isEpisodeDateToday } from '../../helpers/date-helpers';
 import { ButtonType } from '../../typescript/enums';
 import { IEpisode, IShow, IStorageContext } from '../../typescript/interfaces';
 import './ActionButton.css';
@@ -27,11 +28,22 @@ const ActionButton = (props: IProps) => {
     handleDelete && handleDelete(true);
   };
 
+  const getEpisodeData = (previousEpisodeData: IEpisode, nextEpisodeData: IEpisode): IEpisode | undefined => {
+    if (previousEpisodeData && !(previousEpisodeData instanceof Error)) {
+      if (isEpisodeDateToday(previousEpisodeData.airstamp)) { return previousEpisodeData; }
+    }
+    if (nextEpisodeData && !(nextEpisodeData instanceof Error)) { return nextEpisodeData; }
+    return undefined;
+  };
+
   const onAdd = async () => {
     const nextEpisodeUrl = show?._links?.nextepisode?.href;
+    const prevEpisodeUrl = show?._links?.previousepisode?.href;
     const nextEpisodeData: IEpisode = nextEpisodeUrl ? await API.getEpisode(nextEpisodeUrl) : undefined;
-    const nextEpisodeDataSuccess = !(nextEpisodeData instanceof Error);
-    if (nextEpisodeDataSuccess) { show.nextEpisodeData = nextEpisodeData; }
+    const previousEpisodeData: IEpisode = prevEpisodeUrl ? await API.getEpisode(prevEpisodeUrl) : undefined;
+
+    const episodeData = getEpisodeData(previousEpisodeData, nextEpisodeData);
+    if (episodeData) { show.nextEpisodeData = episodeData; }
     setIsShowAdded(true);
     addToShows(show);
   };

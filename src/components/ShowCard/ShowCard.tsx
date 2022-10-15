@@ -8,11 +8,12 @@ import {
 import { IShow, IShowResponse, IStorageContext } from '../../typescript/interfaces';
 import ActionButton from '../ActionButton/ActionButton';
 import {
-  formatAvgRuntime, formatGenres, formatPremiere, formatRating, formatSummary, getDaysUntilNewEpisode
+  formatAvgRuntime, formatGenres, formatPremiere, formatRating, formatSummary
 } from '../../helpers/format-helpers';
 import { ButtonType, Section } from '../../typescript/enums';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
 import { StorageContext } from '../../context/storage-context';
+import { getDaysUntilNewEpisode, isEpisodeDateValid } from '../../helpers/date-helpers';
 
 const SEPARATOR = '\u2022';
 
@@ -67,7 +68,9 @@ const ShowCard = (props: IProps) => {
   };
 
   const fadedClass = showDeleteConfirmation ? 'faded' : '';
-  const newEpisodeDays = (show.nextEpisodeData?.airstamp && getDaysUntilNewEpisode(show.nextEpisodeData.airstamp));
+  const nextEpisodeAirstamp = show.nextEpisodeData?.airstamp;
+  const newEpisodeDays = nextEpisodeAirstamp && isEpisodeDateValid(nextEpisodeAirstamp)
+    && getDaysUntilNewEpisode(nextEpisodeAirstamp);
   const network = show.network?.name || show.webChannel?.name;
 
   const onConfirmDelete = () => {
@@ -83,7 +86,7 @@ const ShowCard = (props: IProps) => {
         </div>
         <div className={`show-details ${fadedClass}`}>
           <div className="show-heading">
-            <h4 className="show-title">{name}</h4>
+            <h4 title={name} className="show-title">{name}</h4>
             <ActionButton show={show} type={buttonType} handleDelete={setShowDeleteConfirmation} />
           </div>
           <p className="show-premiere-genres">

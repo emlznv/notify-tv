@@ -35,6 +35,7 @@ export interface IShow {
   _links: {
     self: { href: string };
     nextepisode: { href: string };
+    previousepisode: { href: string };
   }
   nextEpisodeData?: IEpisode;
 }
