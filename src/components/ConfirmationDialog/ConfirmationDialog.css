@@ -10,6 +10,10 @@
   justify-content: center;
 }
 
+.dialog-title {
+  font-weight: 500;
+}
+
 .dialog-buttons-wrapper {
   margin-top: 12px;
 }

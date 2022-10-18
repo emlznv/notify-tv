@@ -17,9 +17,9 @@
 }
 
 .settings-menu-title {
+  font-weight: 500;
   position: relative;
   right: -10px;
-  font-weight: normal;
 }
 
 .settings-menu-title,
