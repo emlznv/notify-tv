@@ -2,9 +2,8 @@
 import { useEffect, useState } from 'react';
 import { IShow } from '../typescript/interfaces';
 
-const useStorage = (show?: IShow) => {
+const useStorage = () => {
   const [addedShows, setAddedShows] = useState<Array<IShow>>([]);
-  const [isShowAdded, setIsShowAdded] = useState<boolean>(false);
 
   const getAddedShows = async () => {
     const data: { shows?: IShow[] } = await chrome.storage.local.get('shows');
@@ -12,34 +11,23 @@ const useStorage = (show?: IShow) => {
     setAddedShows(result);
   };
 
-  const isShowAddedCheck = async () => {
-    const existingShow = show && addedShows.find((item: IShow) => item.id === show.id);
-    setIsShowAdded(!!existingShow);
-  };
-
   useEffect(() => {
     getAddedShows();
-  }, [addedShows]);
+  }, []);
 
-  useEffect(() => {
-    show && isShowAddedCheck();
-  }, [show, addedShows]);
-
-  const addToShows = async () => {
+  const addToShows = async (show: IShow) => {
     if (!show) { return; }
 
     const updatedShows = [...addedShows, show];
-    chrome.storage.local.set({ shows: updatedShows }, () => {});
-    setIsShowAdded(true);
+    chrome.storage.local.set({ shows: updatedShows });
     setAddedShows(updatedShows);
   };
 
-  const deleteShow = async () => {
+  const deleteShow = async (show: IShow) => {
     if (!show) { return; }
 
     const updatedShows = addedShows.filter((item: IShow) => item.id !== show.id);
-    chrome.storage.local.set({ shows: updatedShows }, () => {});
-    setIsShowAdded(false);
+    chrome.storage.local.set({ shows: updatedShows });
     setAddedShows(updatedShows);
   };
 
@@ -47,8 +35,7 @@ const useStorage = (show?: IShow) => {
     getAddedShows,
     addToShows,
     deleteShow,
-    addedShows,
-    isShowAdded,
+    addedShows
   };
 };
 

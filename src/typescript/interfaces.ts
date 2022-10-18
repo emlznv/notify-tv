@@ -35,6 +35,7 @@ export interface IShow {
   _links: {
     self: { href: string };
     nextepisode: { href: string };
+    previousepisode: { href: string };
   }
   nextEpisodeData?: IEpisode;
 }
@@ -42,4 +43,10 @@ export interface IShow {
 export interface IShowResponse {
   score: number;
   show: IShow;
+}
+
+export interface IStorageContext {
+  addedShows: IShow[]
+  addToShows: (show: IShow) => void
+  deleteShow: (show: IShow) => void
 }

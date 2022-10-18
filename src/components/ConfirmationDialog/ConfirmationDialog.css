@@ -10,6 +10,10 @@
   justify-content: center;
 }
 
+.dialog-title {
+  font-weight: 500;
+}
+
 .dialog-buttons-wrapper {
   margin-top: 12px;
 }
@@ -22,6 +26,7 @@
 .dialog-confirm-button {
   margin-right: 12px;
   background-color: var(--color-button-added);
+  border: none;
   border-radius: 15px;
   padding: 3px 12px;
 }

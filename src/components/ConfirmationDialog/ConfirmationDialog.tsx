@@ -12,7 +12,7 @@ const ConfirmationDialog = (props: IProps) => {
 
   return (isOpen ? (
     <div className="confirmation-dialog">
-      <h4>{text}</h4>
+      <h4 className="dialog-title">{text}</h4>
       <div className="dialog-buttons-wrapper">
         <button
           type="button"

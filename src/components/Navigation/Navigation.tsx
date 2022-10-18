@@ -1,8 +1,9 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBell, faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
+import { faBell } from '@fortawesome/free-solid-svg-icons';
 
 import './Navigation.css';
 import { Section } from '../../typescript/enums';
+import { SettingsButton } from '../SettingsButton/SettingsButton';
 
 interface IProps {
   activeSection: Section;
@@ -28,7 +29,7 @@ const Navigation = (props: IProps) => {
           icon={faBell}
           size="sm"
         />
-        Notify List
+        My List
       </button>
       <button
         type="button"
@@ -37,11 +38,7 @@ const Navigation = (props: IProps) => {
       >
         Explore
       </button>
-      <FontAwesomeIcon
-        className="settings-button"
-        icon={faEllipsisVertical}
-        onClick={onShowSettingsMenu}
-      />
+      <SettingsButton onShowSettingsMenu={onShowSettingsMenu} />
     </div>
   );
 };

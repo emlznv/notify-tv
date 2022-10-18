@@ -1,20 +1,22 @@
 .search-bar {
   display: flex;
   position: relative;
-  width: 100%;
+  width: 92%;
   margin: 0 auto;
+  margin-top: 13px;
+  margin-bottom: 2px;
 }
 
 .search-input {
   width: 100%;
   border: 2px solid var(--color-highlight-dark);
   border-radius: 20px;
-  padding: 3px 8px;
+  padding: 4px 8px;
 }
 
 .search-icon {
   color: var(--color-faded);
   position: absolute;
-  right: 10px;
-  top: 6px;
+  right: 13px;
+  top: 8px;
 }

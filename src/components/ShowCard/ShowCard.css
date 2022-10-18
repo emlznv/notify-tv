@@ -36,6 +36,7 @@
 }
 
 .show-heading {
+  margin-bottom: 2px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -44,6 +45,15 @@
 .show-network,
 .show-title {
   max-width: 185px;
+}
+
+.show-premiere-genres {
+  max-width: 195px;
+}
+
+.show-network,
+.show-title,
+.show-premiere-genres {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -52,6 +62,10 @@
 .show-rating,
 .show-runtime {
   margin-right: 11px;
+}
+
+.show-next-episode-icon {
+  color: var(--color-icon-calendar);
 }
 
 .show-rating-icon,
@@ -75,10 +89,11 @@
 
 .show-summary {
   margin-top: 10px;
+  padding-bottom: 5px;
 }
 
 .show-summary-button {
-  color: var(--color-text-main);
+  color: var(--color-icon-details);
   cursor: pointer;
 }
 

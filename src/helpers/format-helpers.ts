@@ -16,7 +16,7 @@ export const formatRating = (rating: { average?: number }) => {
 export const formatGenres = (genres?: string[]) => {
   return genres?.length
     ? genres.slice(0, 2).join(', ')
-    : NO_RESULT_TEXT.toUpperCase();
+    : NO_RESULT_TEXT;
 };
 
 export const formatAvgRuntime = (avgRuntime?: number) => {
@@ -36,15 +36,4 @@ export const formatSummary = (summaryHtmlString?: string) => {
   const shortenedSummary = summary.split('. ').slice(0, 3).join('. ');
   const endsWithDot = shortenedSummary[shortenedSummary.length - 1] === '.';
   return endsWithDot ? shortenedSummary : `${shortenedSummary}.`;
-};
-
-export const getDaysUntilNewEpisode = (episodeTimestamp: string) => {
-  const todayDate = new Date();
-  const newEpisodeDate = new Date(episodeTimestamp);
-
-  const differenceMs = newEpisodeDate.getTime() - todayDate.getTime();
-  const differenceDays = differenceMs / (1000 * 3600 * 24);
-
-  if (differenceDays < 1) { return 'Today'; }
-  return `${Math.ceil(differenceDays)} ${Math.ceil(differenceDays) > 1 ? 'days' : 'day'}`;
 };

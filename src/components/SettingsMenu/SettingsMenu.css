@@ -1,26 +1,37 @@
 .settings-menu {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
+  z-index: 200;
   width: 100%;
   background-color: inherit;
   box-shadow: 0 4px 6px -4px var(--color-highlight-dark);  
 }
 
-.settings-menu-title {
+.settings-menu-header {
+  display: flex;
+  align-items: center;
   padding: 15px 5px;
-  box-shadow: 0 4px 6px -4px var(--color-highlight-light);
+  background-color: var(--color-background-nav); 
+  box-shadow: 0 1px 5px -4px;
 }
 
-.settings-menu-list {
-  margin: 10px 0;
+.settings-menu-title {
+  font-weight: 500;
+  position: relative;
+  right: -10px;
+}
+
+.settings-menu-title,
+.settings-menu-button {
+  margin-left: auto;
 }
 
 .settings-menu-item {
   display: flex;
   align-items: center;
   cursor: pointer;
-  padding: 10px 15px;
+  padding: 14px 15px;
   width: 100%;
   border: none;
   background-color: inherit;
@@ -39,4 +50,15 @@
 .settings-menu-item:hover {
   background-color: var(--color-background-hover);
   transition: 0.2s;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  margin-bottom: 8px;
+  font-size: 11px;
+}
+
+.credit-link {
+  color: var(--color-link-external);
 }

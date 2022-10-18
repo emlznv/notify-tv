@@ -1,32 +1,64 @@
-import { useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import './ShowCard.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import {
   faStar, faClock, faChevronDown, faChevronUp, faImage, faFilm, faCalendarCheck
 } from '@fortawesome/free-solid-svg-icons';
-import { IShow } from '../../typescript/interfaces';
+import { IShow, IShowResponse, IStorageContext } from '../../typescript/interfaces';
 import ActionButton from '../ActionButton/ActionButton';
 import {
-  formatAvgRuntime, formatGenres, formatPremiere, formatRating, formatSummary, getDaysUntilNewEpisode
-} from '../../helpers/format.helpers';
+  formatAvgRuntime, formatGenres, formatPremiere, formatRating, formatSummary
+} from '../../helpers/format-helpers';
 import { ButtonType, Section } from '../../typescript/enums';
-import useStorage from '../../hooks/useStorage';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
+import { StorageContext } from '../../context/storage-context';
+import { getDaysUntilNewEpisode, isEpisodeDateValid } from '../../helpers/date-helpers';
 
-const separator = '\u2022';
+const SEPARATOR = '\u2022';
 
-const ShowCard = ({ data, section }: { data: any; section: Section }) => {
-  const show: IShow = data.show || data;
+interface IProps {
+  data: IShow | IShowResponse
+  section: Section
+}
+
+const ShowCard = (props: IProps) => {
+  const { section, data } = props;
+  const show: IShow = (data as IShowResponse).show || data;
   const { name, image, genres, averageRuntime, rating, premiered, summary } = show;
   const buttonType = section === Section.addedShows ? ButtonType.delete : ButtonType.add;
 
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState<boolean>(false);
-  const { deleteShow } = useStorage(show);
+  const { deleteShow } = useContext(StorageContext) as IStorageContext;
 
   const [showSummary, setShowSummary] = useState<boolean>(false);
+  const [isSummaryRefAvailable, setIsSummaryRefAvailable] = useState<boolean>(false);
+  const summaryRef = useRef<HTMLParagraphElement | null>(null);
+
+  const scrollSummaryIntoView = () => {
+    const isElementHidden = summaryRef?.current
+      && summaryRef.current.getBoundingClientRect().bottom > window.innerHeight;
+    if (isElementHidden) {
+      summaryRef?.current?.scrollIntoView({ block: 'end', inline: 'nearest', behavior: 'smooth' });
+    }
+  };
+
+  const handleCurrentSummaryRef = (el: HTMLParagraphElement | null) => {
+    summaryRef.current = el;
+    setIsSummaryRefAvailable(!!el);
+  };
+
+  useEffect(() => {
+    isSummaryRefAvailable && scrollSummaryIntoView();
+  }, [isSummaryRefAvailable]);
+
   const handleShowSummary = () => setShowSummary(!showSummary);
   const summaryIcon = showSummary ? faChevronUp : faChevronDown;
+
+  useEffect(() => {
+    setShowSummary(false);
+    setShowDeleteConfirmation(false);
+  }, [section]);
 
   const getPoster = () => {
     const imageSrc = image?.medium;
@@ -36,11 +68,13 @@ const ShowCard = ({ data, section }: { data: any; section: Section }) => {
   };
 
   const fadedClass = showDeleteConfirmation ? 'faded' : '';
-  const newEpisodeDays = (show.nextEpisodeData?.airstamp && getDaysUntilNewEpisode(show.nextEpisodeData.airstamp));
+  const nextEpisodeAirstamp = show.nextEpisodeData?.airstamp;
+  const newEpisodeDays = nextEpisodeAirstamp && isEpisodeDateValid(nextEpisodeAirstamp)
+    && getDaysUntilNewEpisode(nextEpisodeAirstamp);
   const network = show.network?.name || show.webChannel?.name;
 
   const onConfirmDelete = () => {
-    deleteShow();
+    deleteShow(show);
     setShowDeleteConfirmation(false);
   };
 
@@ -52,12 +86,12 @@ const ShowCard = ({ data, section }: { data: any; section: Section }) => {
         </div>
         <div className={`show-details ${fadedClass}`}>
           <div className="show-heading">
-            <h4 className="show-title">{name}</h4>
+            <h4 title={name} className="show-title">{name}</h4>
             <ActionButton show={show} type={buttonType} handleDelete={setShowDeleteConfirmation} />
           </div>
-          <p>
+          <p className="show-premiere-genres">
             {formatPremiere(premiered)}
-            <span className="show-text-separator">{separator}</span>
+            <span className="show-text-separator">{SEPARATOR}</span>
             {formatGenres(genres)}
           </p>
           <div className="show-info">
@@ -107,7 +141,9 @@ const ShowCard = ({ data, section }: { data: any; section: Section }) => {
             />
           </div>
           {showSummary && (
-            <p className="show-summary">{formatSummary(summary)}</p>
+            <p className="show-summary" ref={(el) => handleCurrentSummaryRef(el)}>
+              {formatSummary(summary)}
+            </p>
           )}
         </div>
         <ConfirmationDialog
