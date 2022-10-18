@@ -1,6 +1,6 @@
 {
   "name": "NotifyTV",
-  "description": "Manage your favorite TV series and get notified for upcoming episodes.",
+  "description": "Get notified for upcoming episodes of your favorite TV series.",
   "version": "0.0.1",
   "manifest_version": 3,
   "permissions": ["storage", "notifications"],
