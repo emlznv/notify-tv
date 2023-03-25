@@ -3,6 +3,8 @@
 NotifyTV is a Google Chrome extension that allows users to add their favorite TV series
 and receive notifications for upcoming episodes.
 
+Available on Chrome Web store: [NotifyTV](https://chrome.google.com/webstore/detail/notifytv/opbfjpihggojpgkmoogkleafoalpbbfn)
+
 
 ## Features 
 
