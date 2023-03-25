@@ -10,7 +10,7 @@ import ActionButton from '../ActionButton/ActionButton';
 import {
   formatAvgRuntime, formatGenres, formatPremiere, formatRating, formatSummary
 } from '../../helpers/format-helpers';
-import { ButtonType, Section } from '../../typescript/enums';
+import { ButtonType, Section, ShowStatus } from '../../typescript/enums';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
 import { StorageContext } from '../../context/storage-context';
 import { getDaysUntilNewEpisode, isEpisodeDateValid } from '../../helpers/date-helpers';
@@ -68,6 +68,8 @@ const ShowCard = (props: IProps) => {
   };
 
   const fadedClass = showDeleteConfirmation ? 'faded' : '';
+  const showEnded = show.status.toLowerCase() === ShowStatus.ended;
+
   const nextEpisodeAirstamp = show.nextEpisodeData?.airstamp;
   const newEpisodeDays = nextEpisodeAirstamp && isEpisodeDateValid(nextEpisodeAirstamp)
     && getDaysUntilNewEpisode(nextEpisodeAirstamp);
@@ -82,6 +84,7 @@ const ShowCard = (props: IProps) => {
     show && (
       <div className="show-card">
         <div className={`show-poster-wrapper ${fadedClass}`}>
+          {showEnded && <span className="show-status">Ended</span>}
           {getPoster()}
         </div>
         <div className={`show-details ${fadedClass}`}>

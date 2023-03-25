@@ -16,6 +16,7 @@
   margin-top: 6px;
   width: 65px;
   height: fit-content;
+  position: relative;
 }
 
 .show-poster {
@@ -23,6 +24,19 @@
   height: 70px;
   border-radius: 6px;
   box-shadow: 4px 0px 13px var(--color-background-main);
+}
+
+.show-status {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  text-align: center;
+  color: initial;
+  background-color: var(--color-status);
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
 .show-details {
