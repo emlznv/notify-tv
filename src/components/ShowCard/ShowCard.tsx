@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faStar, faClock, faChevronDown, faChevronUp, faFilm, faCalendarCheck
 } from '@fortawesome/free-solid-svg-icons';
-import { IShow, IShowResponse, IStorageContext } from '../../typescript/interfaces';
+import { IShow, IStorageContext } from '../../typescript/interfaces';
 import ActionButton from '../ActionButton/ActionButton';
 import {
   formatAvgRuntime, formatGenres, formatPremiere, formatRating, formatSummary
@@ -18,13 +18,12 @@ import { getDaysUntilNewEpisode, isEpisodeDateValid } from '../../helpers/date-h
 const SEPARATOR = '\u2022';
 
 interface IProps {
-  data: IShow | IShowResponse
+  show: IShow
   section: Section
 }
 
 const ShowCard = (props: IProps) => {
-  const { section, data } = props;
-  const show: IShow = (data as IShowResponse).show || data;
+  const { section, show } = props;
   const { name, image, genres, averageRuntime, rating, premiered, summary } = show;
   const buttonType = section === Section.addedShows ? ButtonType.delete : ButtonType.add;
 
