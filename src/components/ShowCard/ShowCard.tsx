@@ -3,7 +3,7 @@ import './ShowCard.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import {
-  faStar, faClock, faChevronDown, faChevronUp, faImage, faFilm, faCalendarCheck
+  faStar, faClock, faChevronDown, faChevronUp, faFilm, faCalendarCheck
 } from '@fortawesome/free-solid-svg-icons';
 import { IShow, IShowResponse, IStorageContext } from '../../typescript/interfaces';
 import ActionButton from '../ActionButton/ActionButton';
@@ -64,7 +64,11 @@ const ShowCard = (props: IProps) => {
     const imageSrc = image?.medium;
     return imageSrc
       ? <img className="show-poster" src={imageSrc} alt="Show Poster" />
-      : <FontAwesomeIcon icon={faImage} />;
+      : (
+        <div className="show-poster no-image">
+          <FontAwesomeIcon icon={faFilm} size="2x" color="var(--color-highlight-dark)" />
+        </div>
+      );
   };
 
   const fadedClass = showDeleteConfirmation ? 'faded' : '';

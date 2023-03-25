@@ -26,6 +26,13 @@
   box-shadow: 4px 0px 13px var(--color-background-main);
 }
 
+.no-image {
+  background-color: var(--color-background-hover);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .show-status {
   position: absolute;
   bottom: 0;
