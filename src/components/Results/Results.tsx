@@ -1,13 +1,13 @@
 import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Section } from '../../typescript/enums';
-import { IShow, IShowResponse } from '../../typescript/interfaces';
+import { IShow } from '../../typescript/interfaces';
 import ShowCard from '../ShowCard/ShowCard';
 import './Results.css';
 
 interface IProps {
   isLoading: boolean;
-  results: IShow[] | IShowResponse[];
+  results: IShow[];
   section: Section;
   fade: boolean;
   error: boolean;
@@ -26,8 +26,8 @@ const Results = (props: IProps) => {
     if (isLoading) { return <div className="loading-spinner" />; }
 
     return results.length ? (
-      results.map((item: IShow | IShowResponse) => (
-        <ShowCard data={item} section={section} />
+      results.map((item: IShow) => (
+        <ShowCard show={item} section={section} />
       ))
     ) : (
       <p className={`no-results-msg ${fadedClass}`}>
