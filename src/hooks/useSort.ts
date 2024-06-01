@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { useEffect, useState } from 'react';
 import {
   faArrowUpAZ, faArrowDownZA, faArrowUp19, faArrowDown91, IconDefinition
@@ -5,7 +6,7 @@ import {
 import { IShow } from '../typescript/interfaces';
 import { Section } from '../typescript/enums';
 
-const SORT_ICONS = {
+const SORT_ICONS: { [key: string]: IconDefinition } = {
   ascName: faArrowUpAZ,
   descName: faArrowDownZA,
   ascNextEpDate: faArrowUp19,
@@ -21,6 +22,19 @@ const useSort = (shows: IShow[], section: Section) => {
   const [sortIcon, setSortIcon] = useState<IconDefinition | null>(SORT_ICONS.ascName);
   const [sortLabel, setSortLabel] = useState<string>(SORT_LABELS.Alphabetical);
   const [sortedData, setSortedData] = useState<IShow[]>(shows);
+
+  useEffect(() => {
+    chrome.storage.local.get('sortType', (result) => {
+      const savedSortType = result.sortType;
+      if (savedSortType) {
+        setSortIcon(SORT_ICONS[savedSortType]);
+        setSortLabel(
+          savedSortType === 'ascName' || savedSortType === 'descName'
+            ? SORT_LABELS.Alphabetical : SORT_LABELS.NextEpisode
+        );
+      }
+    });
+  }, []);
 
   const sortData = (data: IShow[]) => {
     if (!sortIcon) return data;
@@ -58,25 +72,32 @@ const useSort = (shows: IShow[], section: Section) => {
   };
 
   const toggleSortIcon = () => {
+    let updatedSortIcon: IconDefinition;
+
     switch (sortIcon) {
       case SORT_ICONS.ascName:
-        setSortIcon(SORT_ICONS.descName);
+        updatedSortIcon = SORT_ICONS.descName;
         setSortLabel(SORT_LABELS.Alphabetical);
         break;
       case SORT_ICONS.descName:
-        setSortIcon(SORT_ICONS.ascNextEpDate);
+        updatedSortIcon = SORT_ICONS.ascNextEpDate;
         setSortLabel(SORT_LABELS.NextEpisode);
         break;
       case SORT_ICONS.ascNextEpDate:
-        setSortIcon(SORT_ICONS.descNextEpDate);
+        updatedSortIcon = SORT_ICONS.descNextEpDate;
         setSortLabel(SORT_LABELS.NextEpisode);
         break;
       case SORT_ICONS.descNextEpDate:
       default:
-        setSortIcon(SORT_ICONS.ascName);
+        updatedSortIcon = SORT_ICONS.ascName;
         setSortLabel(SORT_LABELS.Alphabetical);
         break;
     }
+
+    setSortIcon(updatedSortIcon);
+
+    const updatedSortType = Object.keys(SORT_ICONS).find((key) => SORT_ICONS[key] === updatedSortIcon);
+    chrome.storage.local.set({ sortType: updatedSortType });
   };
 
   useEffect(() => {

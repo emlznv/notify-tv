@@ -1,9 +1,7 @@
-/* eslint-disable no-unsafe-optional-chaining */
 import {
-  faCircleExclamation, faArrowUpAZ, faArrowDownZA, faArrowUp19, faArrowDown91, IconDefinition
+  faCircleExclamation, IconDefinition
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useState } from 'react';
 import useSort from '../../hooks/useSort';
 import { Section } from '../../typescript/enums';
 import { IShow } from '../../typescript/interfaces';
