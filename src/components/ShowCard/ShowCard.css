@@ -104,7 +104,8 @@
   color: var(--color-icon-rating);
 }
 
-.show-runtime-icon {
+.show-runtime-icon,
+.show-network-icon {
   color: var(--color-icon-runtime);
 }
 

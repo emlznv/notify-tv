@@ -1,5 +1,8 @@
-import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCircleExclamation, IconDefinition
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import useSort from '../../hooks/useSort';
 import { Section } from '../../typescript/enums';
 import { IShow } from '../../typescript/interfaces';
 import ShowCard from '../ShowCard/ShowCard';
@@ -19,6 +22,7 @@ const ERROR_MSG = 'An error occured. Please try again.';
 
 const Results = (props: IProps) => {
   const { results, section, fade, isLoading, error } = props;
+  const { sortIcon, sortLabel, sortedData, toggleSortIcon } = useSort(results, section);
   const fadedClass = fade ? 'faded' : '';
   const searchResultsMsg = error ? ERROR_MSG : NO_RESULTS_FOUND_MSG;
 
@@ -26,9 +30,17 @@ const Results = (props: IProps) => {
     if (isLoading) { return <div className="loading-spinner" />; }
 
     return results.length ? (
-      results.map((item: IShow) => (
-        <ShowCard show={item} section={section} />
-      ))
+      <>
+        {section === Section.addedShows && results.length && (
+          <div className="sort-heading">
+            <FontAwesomeIcon className="sort-button" icon={sortIcon as IconDefinition} onClick={toggleSortIcon} />
+            <span className="sort-label">{sortLabel}</span>
+          </div>
+        )}
+        {sortedData.map((item: IShow) => (
+          <ShowCard show={item} section={section} />
+        ))}
+      </>
     ) : (
       <p className={`no-results-msg ${fadedClass}`}>
         {error && <FontAwesomeIcon className="error-icon" icon={faCircleExclamation} size="lg" />}
