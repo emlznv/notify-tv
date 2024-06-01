@@ -41,7 +41,7 @@
 
 .sort-button {
   cursor: pointer;
-  color: var(--color-highlight-light);
+  color: var(--color-icon-details);
 }
 
 .sort-button:hover {
