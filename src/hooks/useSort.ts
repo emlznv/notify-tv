@@ -49,8 +49,8 @@ const useSort = (shows: IShow[], section: Section) => {
       case SORT_ICONS.ascNextEpDate:
       case SORT_ICONS.descNextEpDate:
         data.sort((a, b) => {
-          const aNextEpisodeDate = a.nextEpisodeData?.airdate;
-          const bNextEpisodeDate = b.nextEpisodeData?.airdate;
+          const aNextEpisodeDate = a.nextEpisodeData?.airstamp;
+          const bNextEpisodeDate = b.nextEpisodeData?.airstamp;
 
           if (aNextEpisodeDate && bNextEpisodeDate) {
             return (
