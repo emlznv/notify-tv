@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { IShowResponse } from '../typescript/interfaces';
+import { IShow, IShowResponse } from '../typescript/interfaces';
 import * as API from '../api/api';
 
 const SEARCH_TIMEOUT = 600;
 
 const useSearch = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState<Array<IShowResponse>>([]);
+  const [searchResults, setSearchResults] = useState<Array<IShow>>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
 
@@ -20,7 +20,7 @@ const useSearch = () => {
 
       setIsLoading(false);
       setError(hasError);
-      !hasError && setSearchResults(response as IShowResponse[]);
+      !hasError && setSearchResults(response.map((item) => item.show));
     }, SEARCH_TIMEOUT);
 
     return () => clearTimeout(executeSearch);

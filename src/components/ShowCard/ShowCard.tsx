@@ -3,14 +3,14 @@ import './ShowCard.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import {
-  faStar, faClock, faChevronDown, faChevronUp, faImage, faFilm, faCalendarCheck
+  faStar, faClock, faChevronDown, faChevronUp, faFilm, faCalendarCheck
 } from '@fortawesome/free-solid-svg-icons';
-import { IShow, IShowResponse, IStorageContext } from '../../typescript/interfaces';
+import { IShow, IStorageContext } from '../../typescript/interfaces';
 import ActionButton from '../ActionButton/ActionButton';
 import {
   formatAvgRuntime, formatGenres, formatPremiere, formatRating, formatSummary
 } from '../../helpers/format-helpers';
-import { ButtonType, Section } from '../../typescript/enums';
+import { ButtonType, Section, ShowStatus } from '../../typescript/enums';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
 import { StorageContext } from '../../context/storage-context';
 import { getDaysUntilNewEpisode, isEpisodeDateValid } from '../../helpers/date-helpers';
@@ -18,13 +18,12 @@ import { getDaysUntilNewEpisode, isEpisodeDateValid } from '../../helpers/date-h
 const SEPARATOR = '\u2022';
 
 interface IProps {
-  data: IShow | IShowResponse
+  show: IShow
   section: Section
 }
 
 const ShowCard = (props: IProps) => {
-  const { section, data } = props;
-  const show: IShow = (data as IShowResponse).show || data;
+  const { section, show } = props;
   const { name, image, genres, averageRuntime, rating, premiered, summary } = show;
   const buttonType = section === Section.addedShows ? ButtonType.delete : ButtonType.add;
 
@@ -64,10 +63,16 @@ const ShowCard = (props: IProps) => {
     const imageSrc = image?.medium;
     return imageSrc
       ? <img className="show-poster" src={imageSrc} alt="Show Poster" />
-      : <FontAwesomeIcon icon={faImage} />;
+      : (
+        <div className="show-poster no-image">
+          <FontAwesomeIcon icon={faFilm} size="2x" color="var(--color-highlight-dark)" />
+        </div>
+      );
   };
 
   const fadedClass = showDeleteConfirmation ? 'faded' : '';
+  const showEnded = show.status.toLowerCase() === ShowStatus.ended;
+
   const nextEpisodeAirstamp = show.nextEpisodeData?.airstamp;
   const newEpisodeDays = nextEpisodeAirstamp && isEpisodeDateValid(nextEpisodeAirstamp)
     && getDaysUntilNewEpisode(nextEpisodeAirstamp);
@@ -82,6 +87,7 @@ const ShowCard = (props: IProps) => {
     show && (
       <div className="show-card">
         <div className={`show-poster-wrapper ${fadedClass}`}>
+          {showEnded && <span className="show-status">Ended</span>}
           {getPoster()}
         </div>
         <div className={`show-details ${fadedClass}`}>
