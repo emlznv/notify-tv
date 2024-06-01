@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { useEffect, useState } from 'react';
 import {
   faArrowUpAZ, faArrowDownZA, faArrowUp19, faArrowDown91, IconDefinition
@@ -13,8 +12,14 @@ const SORT_ICONS = {
   descNextEpDate: faArrowDown91
 };
 
+enum SORT_LABELS {
+  Alphabetical = 'Alphabetical order',
+  NextEpisode = 'Next episode order'
+}
+
 const useSort = (shows: IShow[], section: Section) => {
   const [sortIcon, setSortIcon] = useState<IconDefinition | null>(SORT_ICONS.ascName);
+  const [sortLabel, setSortLabel] = useState<string>(SORT_LABELS.Alphabetical);
   const [sortedData, setSortedData] = useState<IShow[]>(shows);
 
   const sortData = (data: IShow[]) => {
@@ -22,40 +27,30 @@ const useSort = (shows: IShow[], section: Section) => {
 
     switch (sortIcon) {
       case SORT_ICONS.ascName:
-        data.sort((a, b) => (a.name?.localeCompare(b.name)));
+        data.sort((a, b) => (a.name.localeCompare(b.name)));
         break;
       case SORT_ICONS.descName:
-        data.sort((a, b) => (b.name?.localeCompare(a.name)));
+        data.sort((a, b) => (b.name.localeCompare(a.name)));
         break;
       case SORT_ICONS.ascNextEpDate:
-        data.sort((a, b) => {
-          const aNextEpisodeDate = a.nextEpisodeData?.airdate;
-          const bNextEpisodeDate = b.nextEpisodeData?.airdate;
-          if (aNextEpisodeDate && bNextEpisodeDate) {
-            return new Date(aNextEpisodeDate).getTime() - new Date(bNextEpisodeDate).getTime();
-          } if (aNextEpisodeDate && !bNextEpisodeDate) {
-            return -1; // a comes before b
-          } if (!aNextEpisodeDate && bNextEpisodeDate) {
-            return 1; // b comes before a
-          }
-          return 0; // both are equal in terms of sorting
-        });
-        break;
       case SORT_ICONS.descNextEpDate:
         data.sort((a, b) => {
           const aNextEpisodeDate = a.nextEpisodeData?.airdate;
           const bNextEpisodeDate = b.nextEpisodeData?.airdate;
+
           if (aNextEpisodeDate && bNextEpisodeDate) {
-            return new Date(bNextEpisodeDate).getTime() - new Date(aNextEpisodeDate).getTime();
-          } if (aNextEpisodeDate && !bNextEpisodeDate) {
-            return -1; // a comes before b
-          } if (!aNextEpisodeDate && bNextEpisodeDate) {
-            return 1; // b comes before a
+            return (
+              sortIcon === SORT_ICONS.ascNextEpDate
+                ? new Date(aNextEpisodeDate).getTime() - new Date(bNextEpisodeDate).getTime()
+                : new Date(bNextEpisodeDate).getTime() - new Date(aNextEpisodeDate).getTime()
+            );
           }
-          return 0; // both are equal in terms of sorting
+
+          if (aNextEpisodeDate && !bNextEpisodeDate) return -1;
+          if (!aNextEpisodeDate && bNextEpisodeDate) return 1;
+          return 0;
         });
         break;
-
       default:
         break;
     }
@@ -63,23 +58,25 @@ const useSort = (shows: IShow[], section: Section) => {
   };
 
   const toggleSortIcon = () => {
-    let updatedSortIcon;
     switch (sortIcon) {
       case SORT_ICONS.ascName:
-        updatedSortIcon = SORT_ICONS.descName;
+        setSortIcon(SORT_ICONS.descName);
+        setSortLabel(SORT_LABELS.Alphabetical);
         break;
       case SORT_ICONS.descName:
-        updatedSortIcon = SORT_ICONS.ascNextEpDate;
+        setSortIcon(SORT_ICONS.ascNextEpDate);
+        setSortLabel(SORT_LABELS.NextEpisode);
         break;
       case SORT_ICONS.ascNextEpDate:
-        updatedSortIcon = SORT_ICONS.descNextEpDate;
+        setSortIcon(SORT_ICONS.descNextEpDate);
+        setSortLabel(SORT_LABELS.NextEpisode);
         break;
       case SORT_ICONS.descNextEpDate:
       default:
-        updatedSortIcon = SORT_ICONS.ascName;
+        setSortIcon(SORT_ICONS.ascName);
+        setSortLabel(SORT_LABELS.Alphabetical);
         break;
     }
-    setSortIcon(updatedSortIcon);
   };
 
   useEffect(() => {
@@ -93,6 +90,7 @@ const useSort = (shows: IShow[], section: Section) => {
 
   return {
     sortIcon,
+    sortLabel,
     sortedData,
     toggleSortIcon
   };

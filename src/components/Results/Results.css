@@ -33,6 +33,27 @@
   color: var(--color-error);
 }
 
+.sort-heading {
+  text-align: left;
+  margin-left: 10px;
+  margin-top: 7px;
+}
+
+.sort-button {
+  cursor: pointer;
+  color: var(--color-highlight-light);
+}
+
+.sort-button:hover {
+  color: var(--color-highlight-dark);
+  transition: 0.3s;
+}
+
+.sort-label {
+  margin-left: 10px;
+  color: var(--color-text-secondary);
+}
+
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }

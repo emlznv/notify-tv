@@ -24,19 +24,19 @@ const ERROR_MSG = 'An error occured. Please try again.';
 
 const Results = (props: IProps) => {
   const { results, section, fade, isLoading, error } = props;
-  const { sortIcon, sortedData, toggleSortIcon } = useSort(results, section);
+  const { sortIcon, sortLabel, sortedData, toggleSortIcon } = useSort(results, section);
   const fadedClass = fade ? 'faded' : '';
   const searchResultsMsg = error ? ERROR_MSG : NO_RESULTS_FOUND_MSG;
 
   const renderResults = () => {
     if (isLoading) { return <div className="loading-spinner" />; }
-    // SHOULD IT BE SAVED TO CHROME STORAGE?
 
     return results.length ? (
       <>
         {section === Section.addedShows && results.length && (
-          <div style={{ textAlign: 'left' }}>
-            <FontAwesomeIcon icon={sortIcon as IconDefinition} onClick={toggleSortIcon} />
+          <div className="sort-heading">
+            <FontAwesomeIcon className="sort-button" icon={sortIcon as IconDefinition} onClick={toggleSortIcon} />
+            <span className="sort-label">{sortLabel}</span>
           </div>
         )}
         {sortedData.map((item: IShow) => (
