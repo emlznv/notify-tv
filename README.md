@@ -26,13 +26,13 @@ This project is built using React with TypeScript and uses TV series data provid
 Clone the project
 
 ```bash
-  git clone https://link-to-project
+  git clone https://github.com/emlznv/notify-tv.git 
 ```
 
 Go to the project directory
 
 ```bash
-  cd my-project
+  cd notify-tv
 ```
 
 Install dependencies
