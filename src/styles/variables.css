@@ -15,24 +15,23 @@
   --color-icon-calendar: #ffffff;
   --color-icon-details: #ffffff;
   --color-faded: #808080;
-  --color-status: #d3d3d3;
+  --color-error: #ffa6a6;
   --color-link-external: #5d94f7;
 }
 
 @media (prefers-color-scheme: light) {
   :root {
-    --color-background-main: #f6f6f6;
-    --color-background-nav: #e0e0e0;
+    --color-background-main: #fbfbfb;
+    --color-background-nav: #ededed;
     --color-background-hover: #e6e6e6;
-    --color-text-main: #292929;
-    --color-text-secondary: #777777;
-    --color-highlight-dark: #68a0bd;
-    --color-icon-runtime: #aaa5a5;
-    --color-icon-calendar: #68a0bd;
+    --color-text-main: #000000;
+    --color-text-secondary: #939393;
+    --color-icon-runtime: #939393;
+    --color-icon-calendar: #939393;
     --color-icon-details: #939393;
     --color-button-add: #7ac7e1;
     --color-button-added: #37c537;
-    --color-button-delete: #aaa5a5;
-    --color-faded: #add8e6;
+    --color-button-delete: #d1d1d1;
+    --color-faded: #a7a7a7;
   }
 }
