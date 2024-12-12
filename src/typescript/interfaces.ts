@@ -1,3 +1,5 @@
+import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
+
 export interface IEpisode {
   id: number;
   name: string;
@@ -45,8 +47,19 @@ export interface IShowResponse {
   show: IShow;
 }
 
-export interface IStorageContext {
+export interface IShowManager {
   addedShows: IShow[]
-  addToShows: (show: IShow) => void
+  addShow: (show: IShow) => void
   deleteShow: (show: IShow) => void
+}
+
+export interface ISortManager {
+  sortIcon: IconDefinition;
+  sortLabel: string;
+  changeSorting: () => void;
+}
+
+export interface IStorageContext {
+  showManager: IShowManager;
+  sortManager: ISortManager;
 }

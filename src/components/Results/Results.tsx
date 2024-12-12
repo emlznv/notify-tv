@@ -1,12 +1,10 @@
-import {
-  faCircleExclamation, IconDefinition
-} from '@fortawesome/free-solid-svg-icons';
+import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import useSort from '../../hooks/useSort';
 import { Section } from '../../typescript/enums';
-import { IShow } from '../../typescript/interfaces';
+import { IShow, ISortManager } from '../../typescript/interfaces';
 import ShowCard from '../ShowCard/ShowCard';
 import './Results.css';
+import { NO_RESULTS_FOUND_MSG, NO_SHOWS_ADDED_MSG, RESULTS_ERROR_MSG } from '../../helpers/constants';
 
 interface IProps {
   isLoading: boolean;
@@ -14,17 +12,13 @@ interface IProps {
   section: Section;
   fade: boolean;
   error: boolean;
+  sortManager: ISortManager
 }
 
-const NO_SHOWS_ADDED_MSG = 'Add shows to get notified for new episodes.';
-const NO_RESULTS_FOUND_MSG = 'No results to show.';
-const ERROR_MSG = 'An error occured. Please try again.';
-
 const Results = (props: IProps) => {
-  const { results, section, fade, isLoading, error } = props;
-  const { sortIcon, sortLabel, sortedData, toggleSortIcon } = useSort(results, section);
+  const { results, section, fade, isLoading, error, sortManager } = props;
   const fadedClass = fade ? 'faded' : '';
-  const searchResultsMsg = error ? ERROR_MSG : NO_RESULTS_FOUND_MSG;
+  const searchResultsMsg = error ? RESULTS_ERROR_MSG : NO_RESULTS_FOUND_MSG;
 
   const renderResults = () => {
     if (isLoading) { return <div className="loading-spinner" />; }
@@ -33,11 +27,11 @@ const Results = (props: IProps) => {
       <>
         {section === Section.addedShows && results.length && (
           <div className="sort-heading">
-            <FontAwesomeIcon className="sort-button" icon={sortIcon as IconDefinition} onClick={toggleSortIcon} />
-            <span className="sort-label">{sortLabel}</span>
+            <FontAwesomeIcon className="sort-button" icon={sortManager.sortIcon} onClick={sortManager.changeSorting} />
+            <span className="sort-label">{sortManager.sortLabel}</span>
           </div>
         )}
-        {sortedData.map((item: IShow) => (
+        {results.map((item: IShow) => (
           <ShowCard show={item} section={section} />
         ))}
       </>

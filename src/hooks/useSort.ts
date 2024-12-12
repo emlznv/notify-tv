@@ -19,11 +19,11 @@ enum SORT_LABELS {
 }
 
 const useSort = (shows: IShow[], section: Section) => {
-  const [sortIcon, setSortIcon] = useState<IconDefinition | null>(SORT_ICONS.ascName);
+  const [sortIcon, setSortIcon] = useState<IconDefinition>(SORT_ICONS.ascName);
   const [sortLabel, setSortLabel] = useState<string>(SORT_LABELS.Alphabetical);
-  const [sortedData, setSortedData] = useState<IShow[]>(shows);
+  const [sortedShows, setSortedShows] = useState<IShow[]>(shows);
 
-  useEffect(() => {
+  const setInitialSorting = () => {
     chrome.storage.local.get('sortType', (result) => {
       const savedSortType = result.sortType;
       if (savedSortType) {
@@ -34,11 +34,13 @@ const useSort = (shows: IShow[], section: Section) => {
         );
       }
     });
+  };
+
+  useEffect(() => {
+    setInitialSorting();
   }, []);
 
   const sortData = (data: IShow[]) => {
-    if (!sortIcon) return data;
-
     switch (sortIcon) {
       case SORT_ICONS.ascName:
         data.sort((a, b) => (a.name.localeCompare(b.name)));
@@ -71,7 +73,7 @@ const useSort = (shows: IShow[], section: Section) => {
     return data;
   };
 
-  const toggleSortIcon = () => {
+  const changeSorting = () => {
     let updatedSortIcon: IconDefinition;
 
     switch (sortIcon) {
@@ -103,17 +105,17 @@ const useSort = (shows: IShow[], section: Section) => {
   useEffect(() => {
     if (section === Section.addedShows) {
       const sorted = sortData([...shows]);
-      setSortedData(sorted);
+      setSortedShows(sorted);
     } else {
-      setSortedData(shows);
+      setSortedShows(shows);
     }
   }, [shows, section, sortIcon]);
 
   return {
     sortIcon,
     sortLabel,
-    sortedData,
-    toggleSortIcon
+    sortedShows,
+    changeSorting,
   };
 };
 

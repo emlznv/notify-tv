@@ -1,6 +1,6 @@
 import { faCircleXmark, faPlusCircle, faCircleCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import * as API from '../../api/api';
 import { StorageContext } from '../../context/storage-context';
 import { isEpisodeDateToday } from '../../helpers/date-helpers';
@@ -17,10 +17,10 @@ interface IProps {
 const ActionButton = (props: IProps) => {
   const { show, type, handleDelete } = props;
   const [isShowAdded, setIsShowAdded] = useState<boolean>(false);
-  const { addedShows, addToShows } = useContext(StorageContext) as IStorageContext;
+  const { showManager } = useContext(StorageContext) as IStorageContext;
 
   useEffect(() => {
-    const existingShow = addedShows.find((item: IShow) => item.id === show.id);
+    const existingShow = showManager.addedShows.find((item: IShow) => item.id === show.id);
     setIsShowAdded(!!existingShow);
   }, []);
 
@@ -45,7 +45,7 @@ const ActionButton = (props: IProps) => {
     const episodeData = getEpisodeData(previousEpisodeData, nextEpisodeData);
     if (episodeData) { show.nextEpisodeData = episodeData; }
     setIsShowAdded(true);
-    addToShows(show);
+    showManager.addShow(show);
   };
 
   const renderButton = () => {

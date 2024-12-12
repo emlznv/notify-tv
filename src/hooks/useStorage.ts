@@ -1,9 +1,12 @@
 /* eslint-disable no-undef */
 import { useEffect, useState } from 'react';
 import { IShow } from '../typescript/interfaces';
+import useSort from './useSort';
+import { Section } from '../typescript/enums';
 
 const useStorage = () => {
   const [addedShows, setAddedShows] = useState<Array<IShow>>([]);
+  const sorting = useSort(addedShows, Section.addedShows);
 
   const getAddedShows = async () => {
     const data: { shows?: IShow[] } = await chrome.storage.local.get('shows');
@@ -15,7 +18,7 @@ const useStorage = () => {
     getAddedShows();
   }, []);
 
-  const addToShows = async (show: IShow) => {
+  const addShow = async (show: IShow) => {
     if (!show) { return; }
 
     const updatedShows = [...addedShows, show];
@@ -32,10 +35,13 @@ const useStorage = () => {
   };
 
   return {
-    getAddedShows,
-    addToShows,
-    deleteShow,
-    addedShows
+    showManager: {
+      addedShows: sorting.sortedShows,
+      getAddedShows,
+      addShow,
+      deleteShow,
+    },
+    sortManager: sorting,
   };
 };
 

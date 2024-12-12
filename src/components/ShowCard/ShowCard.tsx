@@ -14,8 +14,7 @@ import { ButtonType, Section, ShowStatus } from '../../typescript/enums';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
 import { StorageContext } from '../../context/storage-context';
 import { getDaysUntilNewEpisode, isEpisodeDateValid } from '../../helpers/date-helpers';
-
-const SEPARATOR = '\u2022';
+import { SEPARATOR } from '../../helpers/constants';
 
 interface IProps {
   show: IShow
@@ -28,7 +27,7 @@ const ShowCard = (props: IProps) => {
   const buttonType = section === Section.addedShows ? ButtonType.delete : ButtonType.add;
 
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState<boolean>(false);
-  const { deleteShow } = useContext(StorageContext) as IStorageContext;
+  const { showManager } = useContext(StorageContext) as IStorageContext;
 
   const [showSummary, setShowSummary] = useState<boolean>(false);
   const [isSummaryRefAvailable, setIsSummaryRefAvailable] = useState<boolean>(false);
@@ -79,7 +78,7 @@ const ShowCard = (props: IProps) => {
   const network = show.network?.name || show.webChannel?.name;
 
   const onConfirmDelete = () => {
-    deleteShow(show);
+    showManager.deleteShow(show);
     setShowDeleteConfirmation(false);
   };
 

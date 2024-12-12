@@ -1,14 +1,14 @@
 import { ReactNode, useEffect, useState } from 'react';
-import './App.css';
+import useSearch from './hooks/useSearch';
+import useStorage from './hooks/useStorage';
 import Navigation from './components/Navigation/Navigation';
 import Results from './components/Results/Results';
 import SearchBar from './components/SearchBar/SearchBar';
 import SettingsMenu from './components/SettingsMenu/SettingsMenu';
 import { StorageContext } from './context/storage-context';
-import useSearch from './hooks/useSearch';
-import useStorage from './hooks/useStorage';
 import { Section } from './typescript/enums';
 import { IStorageContext } from './typescript/interfaces';
+import './App.css';
 
 const StorageContextProvider = ({ children, storage }: { children: ReactNode[], storage: IStorageContext}) => {
   return (
@@ -26,7 +26,7 @@ const App = () => {
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
 
   const isSearchSection = activeSection === Section.search;
-  const resultsData = isSearchSection ? searchResults : storage.addedShows;
+  const resultsData = isSearchSection ? searchResults : storage.showManager.addedShows;
 
   useEffect(() => {
     !isSearchSection && clearSearch();
@@ -49,6 +49,7 @@ const App = () => {
           fade={showSettingsMenu}
           results={resultsData}
           section={activeSection}
+          sortManager={storage.sortManager}
         />
         {showSettingsMenu && <SettingsMenu onShowSettingsMenu={handleShowSettingsMenu} />}
       </StorageContextProvider>
