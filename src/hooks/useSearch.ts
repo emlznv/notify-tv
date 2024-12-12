@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { IShow, IShowResponse } from '../typescript/interfaces';
 import * as API from '../api/api';
-
-const SEARCH_TIMEOUT = 600;
+import { SEARCH_TIMEOUT } from '../helpers/constants';
 
 const useSearch = () => {
   const [searchTerm, setSearchTerm] = useState('');
