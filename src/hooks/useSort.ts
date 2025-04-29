@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import { useEffect, useState } from 'react';
 import {
   faArrowUpAZ, faArrowDownZA, faArrowUp19, faArrowDown91, IconDefinition

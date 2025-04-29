@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import { useEffect, useState } from 'react';
 import { IShow } from '../typescript/interfaces';
 import useSort from './useSort';

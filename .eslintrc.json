@@ -51,5 +51,8 @@
     "import/resolver": {
       "typescript": {}
     }
+  },
+  "globals": {
+    "chrome": "readonly"
   }
 }
