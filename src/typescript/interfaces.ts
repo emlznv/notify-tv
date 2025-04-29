@@ -1,5 +1,10 @@
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 
+export interface IShowImage {
+  medium?: string;
+  original?: string;
+}
+
 export interface IEpisode {
   id: number;
   name: string;
@@ -9,10 +14,7 @@ export interface IEpisode {
   airtime: string;
   airstamp: string;
   rating: { average?: number };
-  image: {
-    medium?: string;
-    original?: string;
-  };
+  image: IShowImage
   summary: string;
 }
 

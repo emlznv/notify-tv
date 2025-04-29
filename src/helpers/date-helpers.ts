@@ -1,10 +1,12 @@
-const addDays = (date: Date, days: number) => {
+export const addDays = (date: Date, days: number) => {
   const result = new Date(date);
   result.setDate(result.getDate() + days);
   return result;
 };
 
-export const isEpisodeDateToday = (episodeTimestamp: string) => {
+export const isEpisodeDateToday = (episodeTimestamp?: string) => {
+  if (!episodeTimestamp) { return false; }
+
   const todayDate = new Date();
   const newEpisodeDate = new Date(episodeTimestamp);
   const isEpisodeToday = todayDate.getDate() === newEpisodeDate.getDate()
