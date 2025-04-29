@@ -3,7 +3,7 @@ import {
   faArrowUpAZ, faArrowDownZA, faArrowUp19, faArrowDown91, IconDefinition
 } from '@fortawesome/free-solid-svg-icons';
 import { IShow } from '../typescript/interfaces';
-import { Section } from '../typescript/enums';
+import { ChromeStorageKeys, Section } from '../typescript/enums';
 
 const SORT_ICONS: { [key: string]: IconDefinition } = {
   ascName: faArrowUpAZ,
@@ -23,7 +23,7 @@ const useSort = (shows: IShow[], section: Section) => {
   const [sortedShows, setSortedShows] = useState<IShow[]>(shows);
 
   const setInitialSorting = () => {
-    chrome.storage.local.get('sortType', (result) => {
+    chrome.storage.local.get(ChromeStorageKeys.sortType, (result) => {
       const savedSortType = result.sortType;
       if (savedSortType) {
         setSortIcon(SORT_ICONS[savedSortType]);

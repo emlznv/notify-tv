@@ -1,3 +1,4 @@
+import { IEpisode } from '../typescript/interfaces';
 import { NO_INFO_TEXT, NO_SUMMARY_TEXT } from './constants';
 
 export const formatPremiere = (value?: string) => {
@@ -35,4 +36,29 @@ export const formatSummary = (summaryHtmlString?: string) => {
   const shortenedSummary = summary.split('. ').slice(0, 3).join('. ');
   const endsWithDot = shortenedSummary[shortenedSummary.length - 1] === '.';
   return endsWithDot ? shortenedSummary : `${shortenedSummary}.`;
+};
+
+export const formatSeasonOrEpisodeNumber = (value: number) => {
+  if (!value) { return; }
+  return value.toString().length === 1 ? `0${value}` : value;
+};
+
+export const formatNotificationMessage = (episode: IEpisode) => {
+  if (!episode) { return ''; }
+  const { name, season, number } = episode;
+  const seasonAndEpisode = `(S${formatSeasonOrEpisodeNumber(season)} E${formatSeasonOrEpisodeNumber(number)})`;
+  return `${name} ${seasonAndEpisode}`;
+};
+
+export const getNotificationDayText = (day: number) => {
+  switch (day) {
+    case 0:
+      return 'today';
+    case 1:
+      return 'tomorrow';
+    case 3:
+      return 'in 3 days';
+    default:
+      break;
+  }
 };

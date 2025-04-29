@@ -36,3 +36,8 @@ export const isEpisodeDateValid = (episodeTimestamp: string) => {
   const isEpisodeToday = isEpisodeDateToday(episodeTimestamp);
   return isEpisodeInFuture || isEpisodeToday;
 };
+
+export const getDaysDifferenceBetweenDates = (futureDate: Date, pastDate: Date) => {
+  const differenceMs = futureDate.getTime() - pastDate.getTime();
+  return differenceMs / (1000 * 3600 * 24);
+};
