@@ -16,7 +16,8 @@
     "jsx": "react-jsx",
     "paths": {
       "react": ["./node_modules/@types/react"]
-    }
+    },
+    "types": ["chrome"]
   },
   "include": ["src"]
 }

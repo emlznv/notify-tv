@@ -1,10 +1,12 @@
-const addDays = (date: Date, days: number) => {
+export const addDays = (date: Date, days: number) => {
   const result = new Date(date);
   result.setDate(result.getDate() + days);
   return result;
 };
 
-export const isEpisodeDateToday = (episodeTimestamp: string) => {
+export const isEpisodeDateToday = (episodeTimestamp?: string) => {
+  if (!episodeTimestamp) { return false; }
+
   const todayDate = new Date();
   const newEpisodeDate = new Date(episodeTimestamp);
   const isEpisodeToday = todayDate.getDate() === newEpisodeDate.getDate()
@@ -33,4 +35,9 @@ export const isEpisodeDateValid = (episodeTimestamp: string) => {
   const isEpisodeInFuture = episodeDate > todayDate;
   const isEpisodeToday = isEpisodeDateToday(episodeTimestamp);
   return isEpisodeInFuture || isEpisodeToday;
+};
+
+export const getDaysDifferenceBetweenDates = (futureDate: Date, pastDate: Date) => {
+  const differenceMs = futureDate.getTime() - pastDate.getTime();
+  return differenceMs / (1000 * 3600 * 24);
 };
