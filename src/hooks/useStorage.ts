@@ -1,16 +1,23 @@
 import { useEffect, useState } from 'react';
 import { IShow } from '../typescript/interfaces';
-import useSort from './useSort';
 import { ChromeStorageKeys, Section } from '../typescript/enums';
+import { storage } from '../utils/storage';
+import useSort from './useSort';
 
 const useStorage = () => {
+  const [error, setError] = useState<null | string>(null);
   const [addedShows, setAddedShows] = useState<Array<IShow>>([]);
   const sorting = useSort(addedShows, Section.addedShows);
 
   const getAddedShows = async () => {
-    const data: { shows?: IShow[] } = await chrome.storage.local.get(ChromeStorageKeys.shows);
-    const result = data.shows || [];
-    setAddedShows(result);
+    try {
+      const shows = await storage.get<IShow[]>(ChromeStorageKeys.shows);
+      if (Array.isArray(shows)) {
+        setAddedShows(shows);
+      }
+    } catch (err) {
+      setError('Failed to load shows.');
+    }
   };
 
   useEffect(() => {
@@ -18,19 +25,27 @@ const useStorage = () => {
   }, []);
 
   const addShow = async (show: IShow) => {
-    if (!show) { return; }
+    if (!show) return;
 
-    const updatedShows = [...addedShows, show];
-    chrome.storage.local.set({ shows: updatedShows });
-    setAddedShows(updatedShows);
+    try {
+      const updatedShows = [...addedShows, show];
+      await storage.set({ shows: updatedShows });
+      setAddedShows(updatedShows);
+    } catch (err) {
+      setError('Failed to add show to storage.');
+    }
   };
 
   const deleteShow = async (show: IShow) => {
-    if (!show) { return; }
+    if (!show) return;
 
-    const updatedShows = addedShows.filter((item: IShow) => item.id !== show.id);
-    chrome.storage.local.set({ shows: updatedShows });
-    setAddedShows(updatedShows);
+    try {
+      const updatedShows = addedShows.filter((item: IShow) => item.id !== show.id);
+      await storage.set({ shows: updatedShows });
+      setAddedShows(updatedShows);
+    } catch (err) {
+      setError('Failed to delete show from storage.');
+    }
   };
 
   return {
@@ -41,6 +56,7 @@ const useStorage = () => {
       deleteShow,
     },
     sortManager: sorting,
+    error
   };
 };
 

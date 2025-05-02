@@ -4,9 +4,10 @@ import { formatNotificationMessage, getNotificationDayText } from './helpers/for
 import { IEpisode, IShow, IShowImage } from './typescript/interfaces';
 import * as API from './api/api';
 import { ChromeStorageKeys } from './typescript/enums';
+import { storage } from './utils/storage';
 
 const setDefaultNotificationDays = async () => {
-  chrome.storage.local.set({ notificationDays: DEFAULT_NOTIFICATION_DAYS });
+  storage.set({ notificationDays: DEFAULT_NOTIFICATION_DAYS });
 };
 
 const createNotification = ({ dayForNotification, data, showName, image }:
@@ -75,13 +76,13 @@ const updateShowsData = async (shows: IShow[]) => {
   });
 
   const updatedShows = await Promise.all(showPromises);
-  chrome.storage.local.set({ lastUpdated: new Date().toISOString() });
+  storage.set({ lastUpdated: new Date().toISOString() });
   return updatedShows;
 };
 
 const notifyForNextEpisode = async () => {
-  let { shows } = await chrome.storage.local.get(ChromeStorageKeys.shows);
-  const { lastUpdated, lastNotified, notificationDays } = await chrome.storage.local.get();
+  let shows = await storage.get<IShow[]>(ChromeStorageKeys.shows);
+  const { lastUpdated, lastNotified, notificationDays } = await storage.getAll();
   const shouldNotify = shouldUpdateData(lastNotified);
   let isNotificationSent = false;
 
@@ -97,8 +98,8 @@ const notifyForNextEpisode = async () => {
     }
   });
 
-  isNotificationSent && chrome.storage.local.set({ lastNotified: new Date().toISOString() });
-  chrome.storage.local.set({ shows });
+  isNotificationSent && storage.set({ lastNotified: new Date().toISOString() });
+  storage.set({ shows });
 };
 
 chrome.runtime.onStartup.addListener(() => {

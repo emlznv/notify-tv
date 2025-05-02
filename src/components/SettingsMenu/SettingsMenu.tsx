@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { ChromeStorageKeys, NotificationDay } from '../../typescript/enums';
 import { SettingsButton } from '../SettingsButton/SettingsButton';
 import './SettingsMenu.css';
+import { storage } from '../../utils/storage';
 
 interface IProps {
   onShowSettingsMenu: () => void;
@@ -14,10 +15,8 @@ const SettingsMenu = (props: IProps) => {
   const [chosenDays, setChosenDays] = useState<NotificationDay[]>([]);
 
   const getNotificationDays = async () => {
-    const { notificationDays } = await chrome.storage.local.get(
-      ChromeStorageKeys.notificationDays
-    );
-    setChosenDays(notificationDays);
+    const notificationDays = await storage.get<NotificationDay[]>(ChromeStorageKeys.notificationDays);
+    notificationDays && setChosenDays(notificationDays);
   };
 
   const updateNotificationDays = async (day: NotificationDay) => {
@@ -26,7 +25,7 @@ const SettingsMenu = (props: IProps) => {
       ? chosenDays.filter((item) => item !== day)
       : [...chosenDays, day];
     setChosenDays(updatedDays);
-    await chrome.storage.local.set({ notificationDays: updatedDays });
+    storage.set({ notificationDays: updatedDays });
   };
 
   useEffect(() => {

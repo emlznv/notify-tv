@@ -7,7 +7,7 @@ const useSearch = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<Array<IShow>>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>('');
 
   useEffect(() => {
     if (!searchTerm) { return; }
@@ -18,15 +18,21 @@ const useSearch = () => {
       const hasError = response instanceof Error;
 
       setIsLoading(false);
-      setError(hasError);
-      !hasError && setSearchResults(response.map((item) => item.show));
+
+      if (hasError) {
+        setSearchResults([]);
+        setError('An unexpected error occured.');
+      } else {
+        setSearchResults(response.map((item) => item.show));
+        setError('');
+      }
     }, SEARCH_TIMEOUT);
 
     return () => clearTimeout(executeSearch);
   }, [searchTerm, setSearchTerm]);
 
   const clearSearch = () => {
-    setError(false);
+    setError('');
     setSearchTerm('');
     setSearchResults([]);
   };

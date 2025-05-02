@@ -10,6 +10,29 @@
   overflow-y: scroll;
 }
 
+.error-msg {
+  width: 100%;
+  background-color: var(--color-background-nav);
+  position: absolute;
+  bottom: 0;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  font-size: 13px;
+  transition: opacity 0.5s ease-in-out;
+  opacity: 1;
+}
+
+.fade-in-out {
+  animation: fadeInOut 3s ease-in-out forwards;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 ::-webkit-scrollbar {
   width: 3px;
 }
