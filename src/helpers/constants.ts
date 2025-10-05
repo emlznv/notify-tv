@@ -10,5 +10,6 @@ export const NO_SUMMARY_TEXT = 'No overview available.';
 export const SEPARATOR = '\u2022';
 export const SEARCH_TIMEOUT = 600;
 
-export const UPDATE_DAY_FREQUENCY = 0.5;
+export const UPDATE_SHOW_DAY_FREQUENCY = 0.5;
+export const NOTIFY_DAY_FREQUENCY = 0.25;
 export const DEFAULT_NOTIFICATION_DAYS: NotificationDay[] = [NotificationDay.sameDay];

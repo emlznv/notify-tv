@@ -1,4 +1,4 @@
-import { DEFAULT_NOTIFICATION_DAYS, UPDATE_DAY_FREQUENCY } from './helpers/constants';
+import { DEFAULT_NOTIFICATION_DAYS, UPDATE_SHOW_DAY_FREQUENCY, NOTIFY_DAY_FREQUENCY } from './helpers/constants';
 import { addDays, getDaysDifferenceBetweenDates, isEpisodeDateToday } from './helpers/date-helpers';
 import { formatNotificationMessage, getNotificationDayText } from './helpers/format-helpers';
 import { IEpisode, IShow, IShowImage } from './typescript/interfaces';
@@ -41,13 +41,13 @@ const getNotificationDayForEpisode = (notificationDays: string[], episodeTimesta
     });
 };
 
-const shouldUpdateData = (lastUpdated?: string) => {
+const hasIntervalElapsed = (frequencyDays: number, lastUpdated?: string) => {
   if (!lastUpdated) { return true; }
   const todayDate = new Date();
   const lastUpdatedDate = new Date(lastUpdated);
 
   const differenceDays = getDaysDifferenceBetweenDates(todayDate, lastUpdatedDate);
-  return differenceDays >= UPDATE_DAY_FREQUENCY;
+  return differenceDays >= frequencyDays;
 };
 
 const updateShowsData = async (shows: IShow[]) => {
@@ -82,12 +82,12 @@ const updateShowsData = async (shows: IShow[]) => {
 
 const notifyForNextEpisode = async () => {
   const { shows, lastUpdated, lastNotified, notificationDays } = await getFromDatabase();
-  const shouldNotify = shouldUpdateData(lastNotified);
+  const shouldNotify = hasIntervalElapsed(NOTIFY_DAY_FREQUENCY, lastNotified);
   let isNotificationSent = false;
 
   if (!shows?.length || !shouldNotify) return;
 
-  const upToDateShows = shouldUpdateData(lastUpdated)
+  const upToDateShows = hasIntervalElapsed(UPDATE_SHOW_DAY_FREQUENCY, lastUpdated)
     ? await updateShowsData(shows)
     : shows;
 
@@ -129,4 +129,11 @@ chrome.runtime.onStartup.addListener(() => {
 chrome.runtime.onInstalled.addListener(async () => {
   setDefaultNotificationDays();
   await migrateFromChromeStorage();
+  chrome.alarms.create('notifyCheck', { periodInMinutes: NOTIFY_DAY_FREQUENCY });
+});
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === 'notifyCheck') {
+    notifyForNextEpisode();
+  }
 });
