@@ -3,15 +3,16 @@ import { addDays, getDaysDifferenceBetweenDates, isEpisodeDateToday } from './he
 import { formatNotificationMessage, getNotificationDayText } from './helpers/format-helpers';
 import { IEpisode, IShow, IShowImage } from './typescript/interfaces';
 import * as API from './api/api';
-import { ChromeStorageKeys } from './typescript/enums';
+import { StorageKey } from './typescript/enums';
+import { getFromDatabase, saveToDatabase } from './helpers/database-helpers';
 
 const setDefaultNotificationDays = async () => {
-  chrome.storage.local.set({ notificationDays: DEFAULT_NOTIFICATION_DAYS });
+  await saveToDatabase({ notificationDays: DEFAULT_NOTIFICATION_DAYS });
 };
 
 const createNotification = ({ dayForNotification, data, showName, image }:
   { dayForNotification: number, data: IEpisode, showName: string, image: IShowImage }) => {
-  const icon = image?.medium || './public/logo.png';
+  const icon = image?.medium || '../public/logo.png';
   const title = `${showName}: new episode ${getNotificationDayText(dayForNotification)}!`;
 
   chrome.notifications.create('', {
@@ -75,20 +76,22 @@ const updateShowsData = async (shows: IShow[]) => {
   });
 
   const updatedShows = await Promise.all(showPromises);
-  chrome.storage.local.set({ lastUpdated: new Date().toISOString() });
+  await saveToDatabase({ lastUpdated: new Date().toISOString() });
   return updatedShows;
 };
 
 const notifyForNextEpisode = async () => {
-  let { shows } = await chrome.storage.local.get(ChromeStorageKeys.shows);
-  const { lastUpdated, lastNotified, notificationDays } = await chrome.storage.local.get();
+  const { shows, lastUpdated, lastNotified, notificationDays } = await getFromDatabase();
   const shouldNotify = shouldUpdateData(lastNotified);
   let isNotificationSent = false;
 
-  if (!shows?.length || !shouldNotify) { return; }
-  shows = shouldUpdateData(lastUpdated) ? await updateShowsData(shows) : shows;
+  if (!shows?.length || !shouldNotify) return;
 
-  shows.forEach((show: IShow) => {
+  const upToDateShows = shouldUpdateData(lastUpdated)
+    ? await updateShowsData(shows)
+    : shows;
+
+  upToDateShows.forEach((show: IShow) => {
     const dayForNotification = getNotificationDayForEpisode(notificationDays, show.nextEpisodeData?.airstamp);
 
     if (dayForNotification !== undefined && show.nextEpisodeData) {
@@ -97,14 +100,33 @@ const notifyForNextEpisode = async () => {
     }
   });
 
-  isNotificationSent && chrome.storage.local.set({ lastNotified: new Date().toISOString() });
-  chrome.storage.local.set({ shows });
+  if (isNotificationSent) {
+    await saveToDatabase({ lastNotified: new Date().toISOString() });
+  }
+
+  await saveToDatabase({ shows: upToDateShows });
+};
+
+const migrateFromChromeStorage = async () => {
+  const oldData = await chrome.storage.local.get([
+    StorageKey.shows,
+    StorageKey.notificationDays,
+    StorageKey.sortType,
+    StorageKey.lastUpdated,
+    StorageKey.lastNotified
+  ]);
+
+  if (Object.keys(oldData).length > 0) {
+    await saveToDatabase(oldData);
+    await chrome.storage.local.clear();
+  }
 };
 
 chrome.runtime.onStartup.addListener(() => {
   notifyForNextEpisode();
 });
 
-chrome.runtime.onInstalled.addListener(() => {
+chrome.runtime.onInstalled.addListener(async () => {
   setDefaultNotificationDays();
+  await migrateFromChromeStorage();
 });

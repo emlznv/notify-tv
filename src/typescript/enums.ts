@@ -20,7 +20,7 @@ export enum NotificationDay {
   threeDaysBefore = '3'
 }
 
-export enum ChromeStorageKeys {
+export enum StorageKey {
   shows = 'shows',
   lastUpdated = 'lastUpdated',
   lastNotified = 'lastNotified',

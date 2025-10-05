@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 import { IShow } from '../typescript/interfaces';
 import useSort from './useSort';
-import { ChromeStorageKeys, Section } from '../typescript/enums';
+import { Section, StorageKey } from '../typescript/enums';
+import { getFromDatabase, saveToDatabase } from '../helpers/database-helpers';
 
 const useStorage = () => {
-  const [addedShows, setAddedShows] = useState<Array<IShow>>([]);
+  const [addedShows, setAddedShows] = useState<IShow[]>([]);
   const sorting = useSort(addedShows, Section.addedShows);
 
   const getAddedShows = async () => {
-    const data: { shows?: IShow[] } = await chrome.storage.local.get(ChromeStorageKeys.shows);
-    const result = data.shows || [];
-    setAddedShows(result);
+    const { shows } = await getFromDatabase([StorageKey.shows]);
+    setAddedShows(shows || []);
   };
 
   useEffect(() => {
@@ -18,18 +18,18 @@ const useStorage = () => {
   }, []);
 
   const addShow = async (show: IShow) => {
-    if (!show) { return; }
+    if (!show) return;
 
     const updatedShows = [...addedShows, show];
-    chrome.storage.local.set({ shows: updatedShows });
+    await saveToDatabase({ shows: updatedShows });
     setAddedShows(updatedShows);
   };
 
   const deleteShow = async (show: IShow) => {
-    if (!show) { return; }
+    if (!show) return;
 
-    const updatedShows = addedShows.filter((item: IShow) => item.id !== show.id);
-    chrome.storage.local.set({ shows: updatedShows });
+    const updatedShows = addedShows.filter((item) => item.id !== show.id);
+    await saveToDatabase({ shows: updatedShows });
     setAddedShows(updatedShows);
   };
 

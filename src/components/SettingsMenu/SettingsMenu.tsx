@@ -1,8 +1,9 @@
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
-import { ChromeStorageKeys, NotificationDay } from '../../typescript/enums';
+import { StorageKey, NotificationDay } from '../../typescript/enums';
 import { SettingsButton } from '../SettingsButton/SettingsButton';
+import { getFromDatabase, saveToDatabase } from '../../helpers/database-helpers';
 import './SettingsMenu.css';
 
 interface IProps {
@@ -14,19 +15,20 @@ const SettingsMenu = (props: IProps) => {
   const [chosenDays, setChosenDays] = useState<NotificationDay[]>([]);
 
   const getNotificationDays = async () => {
-    const { notificationDays } = await chrome.storage.local.get(
-      ChromeStorageKeys.notificationDays
-    );
-    setChosenDays(notificationDays);
+    const { notificationDays } = await getFromDatabase([
+      StorageKey.notificationDays,
+    ]);
+    setChosenDays(notificationDays || []);
   };
 
   const updateNotificationDays = async (day: NotificationDay) => {
-    const isDayAdded = chosenDays.find((item) => item === day);
+    const isDayAdded = chosenDays.includes(day);
     const updatedDays = isDayAdded
       ? chosenDays.filter((item) => item !== day)
       : [...chosenDays, day];
+
     setChosenDays(updatedDays);
-    await chrome.storage.local.set({ notificationDays: updatedDays });
+    await saveToDatabase({ notificationDays: updatedDays });
   };
 
   useEffect(() => {
