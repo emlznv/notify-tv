@@ -12,7 +12,7 @@ const setDefaultNotificationDays = async () => {
 
 const createNotification = ({ dayForNotification, data, showName, image }:
   { dayForNotification: number, data: IEpisode, showName: string, image: IShowImage }) => {
-  const icon = image?.medium || './public/logo.png';
+  const icon = image?.medium || '../public/logo.png';
   const title = `${showName}: new episode ${getNotificationDayText(dayForNotification)}!`;
 
   chrome.notifications.create('', {
