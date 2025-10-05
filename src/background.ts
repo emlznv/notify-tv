@@ -127,6 +127,6 @@ chrome.runtime.onStartup.addListener(() => {
 });
 
 chrome.runtime.onInstalled.addListener(async () => {
-  await migrateFromChromeStorage();
   setDefaultNotificationDays();
+  await migrateFromChromeStorage();
 });
