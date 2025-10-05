@@ -3,7 +3,8 @@ import {
   faArrowUpAZ, faArrowDownZA, faArrowUp19, faArrowDown91, IconDefinition
 } from '@fortawesome/free-solid-svg-icons';
 import { IShow } from '../typescript/interfaces';
-import { ChromeStorageKeys, Section } from '../typescript/enums';
+import { StorageKey, Section } from '../typescript/enums';
+import { getFromDatabase, saveToDatabase } from '../helpers/database-helpers';
 
 const SORT_ICONS: { [key: string]: IconDefinition } = {
   ascName: faArrowUpAZ,
@@ -22,17 +23,16 @@ const useSort = (shows: IShow[], section: Section) => {
   const [sortLabel, setSortLabel] = useState<string>(SORT_LABELS.Alphabetical);
   const [sortedShows, setSortedShows] = useState<IShow[]>(shows);
 
-  const setInitialSorting = () => {
-    chrome.storage.local.get(ChromeStorageKeys.sortType, (result) => {
-      const savedSortType = result.sortType;
-      if (savedSortType) {
-        setSortIcon(SORT_ICONS[savedSortType]);
-        setSortLabel(
-          savedSortType === 'ascName' || savedSortType === 'descName'
-            ? SORT_LABELS.Alphabetical : SORT_LABELS.NextEpisode
-        );
-      }
-    });
+  const setInitialSorting = async () => {
+    const { sortType } = await getFromDatabase([StorageKey.sortType]);
+    if (sortType) {
+      setSortIcon(SORT_ICONS[sortType]);
+      setSortLabel(
+        sortType === 'ascName' || sortType === 'descName'
+          ? SORT_LABELS.Alphabetical
+          : SORT_LABELS.NextEpisode
+      );
+    }
   };
 
   useEffect(() => {
@@ -72,7 +72,7 @@ const useSort = (shows: IShow[], section: Section) => {
     return data;
   };
 
-  const changeSorting = () => {
+  const changeSorting = async () => {
     let updatedSortIcon: IconDefinition;
 
     switch (sortIcon) {
@@ -98,7 +98,7 @@ const useSort = (shows: IShow[], section: Section) => {
     setSortIcon(updatedSortIcon);
 
     const updatedSortType = Object.keys(SORT_ICONS).find((key) => SORT_ICONS[key] === updatedSortIcon);
-    chrome.storage.local.set({ sortType: updatedSortType });
+    await saveToDatabase({ sortType: updatedSortType });
   };
 
   useEffect(() => {
