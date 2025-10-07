@@ -5,6 +5,7 @@ import { IEpisode, IShow, IShowImage } from './typescript/interfaces';
 import * as API from './api/api';
 import { StorageKey } from './typescript/enums';
 import { getFromDatabase, saveToDatabase } from './helpers/database-helpers';
+import { db } from './database/database';
 
 const setDefaultNotificationDays = async () => {
   await saveToDatabase({ notificationDays: DEFAULT_NOTIFICATION_DAYS });
@@ -91,14 +92,32 @@ const notifyForNextEpisode = async () => {
     ? await updateShowsData(shows)
     : shows;
 
-  upToDateShows.forEach((show: IShow) => {
-    const dayForNotification = getNotificationDayForEpisode(notificationDays, show.nextEpisodeData?.airstamp);
+  await Promise.all(
+    upToDateShows.map(async (show: IShow) => {
+      const episode = show.nextEpisodeData;
+      if (!episode) return;
 
-    if (dayForNotification !== undefined && show.nextEpisodeData) {
-      createNotification({ dayForNotification, data: show.nextEpisodeData, showName: show.name, image: show.image });
+      const dayForNotification = getNotificationDayForEpisode(notificationDays, episode.airstamp);
+      if (dayForNotification === undefined) return;
+
+      const alreadyNotified = await db.notifiedEpisodes.get(episode.id);
+      if (alreadyNotified) return;
+
+      createNotification({
+        dayForNotification,
+        data: episode,
+        showName: show.name,
+        image: show.image
+      });
+
+      await db.notifiedEpisodes.put({
+        episodeId: episode.id,
+        notifiedAt: new Date().toISOString()
+      });
+
       isNotificationSent = true;
-    }
-  });
+    })
+  );
 
   if (isNotificationSent) {
     await saveToDatabase({ lastNotified: new Date().toISOString() });

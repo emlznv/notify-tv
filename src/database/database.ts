@@ -7,16 +7,24 @@ interface ConfigItem {
   value: any;
 }
 
+interface NotifiedEpisode {
+  episodeId: number;
+  notifiedAt: string;
+}
+
 export class NotifyTVDB extends Dexie {
   shows!: Dexie.Table<IShow, number>;
 
   config!: Dexie.Table<ConfigItem, StorageKey>;
 
+  notifiedEpisodes!: Dexie.Table<NotifiedEpisode, number>;
+
   constructor() {
     super('NotifyTVDB');
     this.version(1).stores({
       shows: 'id',
-      config: 'key'
+      config: 'key',
+      notifiedEpisodes: 'episodeId'
     });
   }
 }
