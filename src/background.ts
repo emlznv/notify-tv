@@ -148,7 +148,7 @@ chrome.runtime.onStartup.addListener(() => {
 chrome.runtime.onInstalled.addListener(async () => {
   setDefaultNotificationDays();
   await migrateFromChromeStorage();
-  chrome.alarms.create('notifyCheck', { periodInMinutes: NOTIFY_DAY_FREQUENCY });
+  chrome.alarms.create('notifyCheck', { periodInMinutes: NOTIFY_DAY_FREQUENCY * 24 * 60 });
 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
