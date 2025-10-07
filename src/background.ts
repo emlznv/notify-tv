@@ -3,18 +3,30 @@ import { addDays, getDaysDifferenceBetweenDates, isEpisodeDateToday } from './he
 import { formatNotificationMessage, getNotificationDayText } from './helpers/format-helpers';
 import { IEpisode, IShow, IShowImage } from './typescript/interfaces';
 import * as API from './api/api';
-import { StorageKey } from './typescript/enums';
+import { NotificationDay, StorageKey } from './typescript/enums';
 import { getFromDatabase, saveToDatabase } from './helpers/database-helpers';
 import { db } from './database/database';
 
-const setDefaultNotificationDays = async () => {
+/**
+ * Sets the default reminder days in the database.
+ */
+const setDefaultReminderDays = async () => {
   await saveToDatabase({ notificationDays: DEFAULT_NOTIFICATION_DAYS });
 };
 
-const createNotification = ({ dayForNotification, data, showName, image }:
-  { dayForNotification: number, data: IEpisode, showName: string, image: IShowImage }) => {
+/**
+ * Sends a Chrome notification for an upcoming TV show episode.
+ *
+ * @param {Object} params
+ * @param {number} params.reminderDay - Number of days until episode airs.
+ * @param {IEpisode} params.data - Episode data object.
+ * @param {string} params.showName - Name of the show.
+ * @param {IShowImage} params.image - Show image object.
+ */
+const sendNotification = ({ reminderDay, data, showName, image }:
+  { reminderDay: number, data: IEpisode, showName: string, image: IShowImage }) => {
   const icon = image?.medium || '../public/logo.png';
-  const title = `${showName}: new episode ${getNotificationDayText(dayForNotification)}!`;
+  const title = `${showName}: new episode ${getNotificationDayText(reminderDay)}!`;
 
   chrome.notifications.create('', {
     title,
@@ -24,13 +36,20 @@ const createNotification = ({ dayForNotification, data, showName, image }:
   });
 };
 
-const getNotificationDayForEpisode = (notificationDays: string[], episodeTimestamp?: string) => {
+/**
+ * Determines if the user-selected reminder days applies for a given episode.
+ *
+ * @param {NotificationDay[]} reminderDays - Array of notification offsets in days.
+ * @param {string} [episodeTimestamp] - ISO string of the episode's air date.
+ * @returns {number | undefined} - Returns the matching reminder day, otherwise undefined.
+ */
+const findMatchingReminderDay = (reminderDays: NotificationDay[], episodeTimestamp?: string) => {
   if (!episodeTimestamp) { return; }
 
   const todayDate = new Date();
   const newEpisodeDate = new Date(episodeTimestamp);
 
-  return notificationDays
+  return reminderDays
     .map(Number)
     .find((day) => {
       const notificationDate = addDays(todayDate, day);
@@ -42,6 +61,13 @@ const getNotificationDayForEpisode = (notificationDays: string[], episodeTimesta
     });
 };
 
+/**
+ * Checks if the interval has elapsed since the last recorded date.
+ *
+ * @param {number} frequencyDays - Frequency in days.
+ * @param {string} [lastUpdated] - ISO string of last updated date.
+ * @returns {boolean} - True if interval has elapsed or lastUpdated is undefined.
+ */
 const hasIntervalElapsed = (frequencyDays: number, lastUpdated?: string) => {
   if (!lastUpdated) { return true; }
   const todayDate = new Date();
@@ -51,17 +77,20 @@ const hasIntervalElapsed = (frequencyDays: number, lastUpdated?: string) => {
   return differenceDays >= frequencyDays;
 };
 
+/**
+ * Updates show data by fetching the latest episode information from the API.
+ *
+ * @param {IShow[]} shows - Array of shows to update.
+ * @returns {Promise<IShow[]>} - Array of updated shows.
+ */
 const updateShowsData = async (shows: IShow[]) => {
   const showPromises = shows.map(async (show) => {
-    if (isEpisodeDateToday(show.nextEpisodeData?.airstamp)) {
-      return show;
-    }
+    if (isEpisodeDateToday(show.nextEpisodeData?.airstamp)) return show;
 
     try {
       const updatedShow = await API.getEpisode(show._links?.self?.href);
-      if (!updatedShow || !updatedShow._links?.nextepisode?.href) {
-        return show;
-      }
+      const nextEpisodeData = updatedShow._links?.nextepisode?.href;
+      if (!updatedShow || !nextEpisodeData) return show;
 
       try {
         const updatedNextEpisodeData = await API.getEpisode(updatedShow._links.nextepisode.href);
@@ -81,6 +110,9 @@ const updateShowsData = async (shows: IShow[]) => {
   return updatedShows;
 };
 
+/**
+ * Notifies the user for the next episode of each show according to reminder days.
+ */
 const notifyForNextEpisode = async () => {
   const { shows, lastUpdated, lastNotified, notificationDays } = await getFromDatabase();
   const shouldNotify = hasIntervalElapsed(NOTIFY_DAY_FREQUENCY, lastNotified);
@@ -97,24 +129,14 @@ const notifyForNextEpisode = async () => {
       const episode = show.nextEpisodeData;
       if (!episode) return;
 
-      const dayForNotification = getNotificationDayForEpisode(notificationDays, episode.airstamp);
-      if (dayForNotification === undefined) return;
+      const reminderDay = findMatchingReminderDay(notificationDays, episode.airstamp);
+      if (reminderDay === undefined) return;
 
       const alreadyNotified = await db.notifiedEpisodes.get(episode.id);
       if (alreadyNotified) return;
 
-      createNotification({
-        dayForNotification,
-        data: episode,
-        showName: show.name,
-        image: show.image
-      });
-
-      await db.notifiedEpisodes.put({
-        episodeId: episode.id,
-        notifiedAt: new Date().toISOString()
-      });
-
+      sendNotification({ reminderDay, data: episode, showName: show.name, image: show.image });
+      await db.notifiedEpisodes.put({ episodeId: episode.id, notifiedAt: new Date().toISOString() });
       isNotificationSent = true;
     })
   );
@@ -126,6 +148,9 @@ const notifyForNextEpisode = async () => {
   await saveToDatabase({ shows: upToDateShows });
 };
 
+/**
+ * Migrates old data from Chrome local storage to IndexedDB and clears Chrome storage.
+ */
 const migrateFromChromeStorage = async () => {
   const oldData = await chrome.storage.local.get([
     StorageKey.shows,
@@ -146,7 +171,7 @@ chrome.runtime.onStartup.addListener(() => {
 });
 
 chrome.runtime.onInstalled.addListener(async () => {
-  setDefaultNotificationDays();
+  setDefaultReminderDays();
   await migrateFromChromeStorage();
   chrome.alarms.create('notifyCheck', { periodInMinutes: NOTIFY_DAY_FREQUENCY * 24 * 60 });
 });
