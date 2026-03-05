@@ -139,6 +139,7 @@ const ShowCard = (props: IProps) => {
               </span>
             )}
             <FontAwesomeIcon
+              data-testid="show-summary-button"
               className="show-summary-button"
               icon={summaryIcon}
               size="lg"

@@ -21,7 +21,7 @@ export interface IEpisode {
 export interface IShow {
   id: number;
   averageRuntime: number;
-  ended: string;
+  ended: string | null;
   genres: Array<string>;
   image: {
     medium?: string;
@@ -31,14 +31,14 @@ export interface IShow {
   name: string;
   premiered: string;
   rating: { average?: number };
-  runtime: number;
+  runtime: number | null;
   status: string;
   summary: string;
   webChannel?: { name: string };
   network?: { name: string };
   _links: {
     self: { href: string };
-    nextepisode: { href: string };
+    nextepisode?: { href: string };
     previousepisode: { href: string };
   }
   nextEpisodeData?: IEpisode;
