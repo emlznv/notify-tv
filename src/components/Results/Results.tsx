@@ -21,18 +21,23 @@ const Results = (props: IProps) => {
   const searchResultsMsg = error ? RESULTS_ERROR_MSG : NO_RESULTS_FOUND_MSG;
 
   const renderResults = () => {
-    if (isLoading) { return <div className="loading-spinner" />; }
+    if (isLoading) { return <div data-testid="loader" className="loading-spinner" />; }
 
     return results.length ? (
       <>
         {section === Section.addedShows && results.length && (
           <div className="sort-heading">
-            <FontAwesomeIcon className="sort-button" icon={sortManager.sortIcon} onClick={sortManager.changeSorting} />
+            <FontAwesomeIcon
+              data-testid="sort-button"
+              className="sort-button"
+              icon={sortManager.sortIcon}
+              onClick={sortManager.changeSorting}
+            />
             <span className="sort-label">{sortManager.sortLabel}</span>
           </div>
         )}
         {results.map((item: IShow) => (
-          <ShowCard show={item} section={section} />
+          <ShowCard key={item.id} show={item} section={section} />
         ))}
       </>
     ) : (
