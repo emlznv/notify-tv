@@ -32,6 +32,7 @@
     "no-underscore-dangle": "off",
     "no-restricted-syntax": "off",
     "jsx-a11y/no-autofocus": "off",
+    "react/jsx-props-no-spreading": "off",
     "@typescript-eslint/no-shadow": ["error"],
     "react/function-component-definition": [
       "warn",
