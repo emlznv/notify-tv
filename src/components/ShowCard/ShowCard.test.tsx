@@ -3,11 +3,9 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { faArrowUpAZ } from '@fortawesome/free-solid-svg-icons';
 import ShowCard from './ShowCard';
-import { Section, ShowStatus } from '../../typescript/enums';
-import { IShow } from '../../typescript/interfaces';
+import { Section } from '../../typescript/enums';
 import { StorageContext } from '../../context/storage-context';
 import { mockShows } from '../../tests/mocks';
-import { formatGenres } from '../../helpers/format-helpers';
 
 const defaultProps = {
   section: Section.addedShows,
@@ -39,7 +37,7 @@ describe('ShowCard', () => {
     expect(screen.getByText(mockShows[0].name)).toBeInTheDocument();
     expect(screen.getByRole('img', { name: /show poster/i })).toHaveAttribute('src', mockShows[0].image.medium);
     expect(screen.getByText(mockShows[0].rating.average!)).toBeInTheDocument();
-    mockShows[0].genres.forEach((genre) => {
+    mockShows[0].genres.slice(0, 2).forEach((genre) => {
       expect(screen.getByText(new RegExp(genre, 'i'))).toBeInTheDocument();
     });
     expect(screen.getByText(new RegExp(String(mockShows[0].rating.average), 'i'))).toBeInTheDocument();

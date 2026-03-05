@@ -27,7 +27,7 @@ const renderComponent = (props = {}) => (
 
 vi.mock('../ShowCard/ShowCard', () => ({
   default: ({ show }: { show: IShow }) => (
-    <div data-testid="mock-show-card">
+    <div data-testid="mock-show-card" key={show.id}>
       <span>{show.name}</span>
       <span>{show.premiered}</span>
       <span>{show.averageRuntime}</span>

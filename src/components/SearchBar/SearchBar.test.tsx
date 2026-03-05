@@ -21,7 +21,7 @@ describe('SearchBar', () => {
 
   test('it renders the component', () => {
     renderComponent();
-    expect(screen.getByText(placeholder)).toBeInTheDocument();
+    expect(screen.getByRole('textbox')).toBeInTheDocument();
   });
   test('it changes the input search term', async () => {
     renderComponent();

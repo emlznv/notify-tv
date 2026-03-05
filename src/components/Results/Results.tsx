@@ -37,7 +37,7 @@ const Results = (props: IProps) => {
           </div>
         )}
         {results.map((item: IShow) => (
-          <ShowCard show={item} section={section} />
+          <ShowCard key={item.id} show={item} section={section} />
         ))}
       </>
     ) : (
