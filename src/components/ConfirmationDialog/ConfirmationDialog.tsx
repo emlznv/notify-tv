@@ -1,13 +1,7 @@
 import './ConfirmationDialog.css';
+import { ConfirmationDialogProps } from './ConfirmationDialog.types';
 
-interface IProps {
-  isOpen: boolean;
-  text: string;
-  onConfirm: () => void;
-  onCancel: () => void;
-}
-
-const ConfirmationDialog = (props: IProps) => {
+const ConfirmationDialog = (props: ConfirmationDialogProps) => {
   const { isOpen, text, onConfirm, onCancel } = props;
 
   return (isOpen ? (

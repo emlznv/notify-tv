@@ -1,21 +1,13 @@
 import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Section } from '../../typescript/enums';
-import { IShow, ISortManager } from '../../typescript/interfaces';
+import { IShow } from '../../typescript/interfaces';
 import ShowCard from '../ShowCard/ShowCard';
-import './Results.css';
 import { NO_RESULTS_FOUND_MSG, NO_SHOWS_ADDED_MSG, RESULTS_ERROR_MSG } from '../../helpers/constants';
+import { ResultsProps } from './Results.types';
+import './Results.css';
 
-interface IProps {
-  isLoading: boolean;
-  results: IShow[];
-  section: Section;
-  fade: boolean;
-  error: boolean;
-  sortManager: ISortManager
-}
-
-const Results = (props: IProps) => {
+const Results = (props: ResultsProps) => {
   const { results, section, fade, isLoading, error, sortManager } = props;
   const fadedClass = fade ? 'faded' : '';
   const searchResultsMsg = error ? RESULTS_ERROR_MSG : NO_RESULTS_FOUND_MSG;

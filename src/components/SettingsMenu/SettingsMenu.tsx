@@ -4,13 +4,10 @@ import { useEffect, useState } from 'react';
 import { StorageKey, NotificationDay } from '../../typescript/enums';
 import { SettingsButton } from '../SettingsButton/SettingsButton';
 import { getFromDatabase, saveToDatabase } from '../../helpers/database-helpers';
+import { SettingsMenuProps } from './SettingsMenu.types';
 import './SettingsMenu.css';
 
-interface IProps {
-  onShowSettingsMenu: () => void;
-}
-
-const SettingsMenu = (props: IProps) => {
+const SettingsMenu = (props: SettingsMenuProps) => {
   const { onShowSettingsMenu } = props;
   const [chosenDays, setChosenDays] = useState<NotificationDay[]>([]);
 

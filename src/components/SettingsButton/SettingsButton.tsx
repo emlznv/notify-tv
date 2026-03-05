@@ -1,12 +1,9 @@
 import { faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { SettingsButtonProps } from './SettingsButton.types';
 import './SettingsButton.css';
 
-interface IProps {
-  onShowSettingsMenu: () => void
-}
-
-export const SettingsButton = (props: IProps) => {
+export const SettingsButton = (props: SettingsButtonProps) => {
   const { onShowSettingsMenu } = props;
   return (
     <FontAwesomeIcon
