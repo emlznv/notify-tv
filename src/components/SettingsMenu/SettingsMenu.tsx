@@ -1,8 +1,7 @@
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { StorageKey, NotificationDay } from '../../typescript/enums';
-import { SettingsButton } from '../SettingsButton/SettingsButton';
 import { getFromDatabase, saveToDatabase } from '../../helpers/database-helpers';
 import { SettingsMenuProps } from './SettingsMenu.types';
 import './SettingsMenu.css';
@@ -60,7 +59,11 @@ const SettingsMenu = (props: SettingsMenuProps) => {
         <div className="settings-menu-header">
           <h4 className="settings-menu-title">Receive episode notification</h4>
           <span className="settings-menu-button">
-            <SettingsButton onShowSettingsMenu={onShowSettingsMenu} />
+            <FontAwesomeIcon
+              className="settings-button"
+              icon={faEllipsisVertical}
+              onClick={onShowSettingsMenu}
+            />
           </span>
         </div>
         <ul className="settings-menu-list">
