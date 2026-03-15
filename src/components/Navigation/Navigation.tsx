@@ -1,9 +1,8 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBell } from '@fortawesome/free-solid-svg-icons';
+import { faBell, faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
 
 import './Navigation.css';
 import { Section } from '../../typescript/enums';
-import { SettingsButton } from '../SettingsButton/SettingsButton';
 import { NavigationProps } from './Navigation.types';
 
 const Navigation = (props: NavigationProps) => {
@@ -33,7 +32,11 @@ const Navigation = (props: NavigationProps) => {
       >
         Explore
       </button>
-      <SettingsButton onShowSettingsMenu={onShowSettingsMenu} />
+      <FontAwesomeIcon
+        className="settings-button"
+        icon={faEllipsisVertical}
+        onClick={onShowSettingsMenu}
+      />
     </div>
   );
 };
