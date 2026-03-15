@@ -68,7 +68,7 @@ const SettingsMenu = (props: SettingsMenuProps) => {
         </div>
         <ul className="settings-menu-list">
           {items.map((item) => (
-            <li>
+            <li key={item.day}>
               <button
                 className="settings-menu-item"
                 type="button"
