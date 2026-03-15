@@ -14,12 +14,15 @@ const useSearch = () => {
 
     const executeSearch = setTimeout(async () => {
       setIsLoading(true);
-      const response: IShowResponse[] | Error = await API.getShowsBySearch(searchTerm);
-      const hasError = response instanceof Error;
-
-      setIsLoading(false);
-      setError(hasError);
-      !hasError && setSearchResults(response.map((item) => item.show));
+      setError(false);
+      try {
+        const results = await API.getShowsBySearch(searchTerm);
+        setSearchResults(results);
+      } catch {
+        setError(true);
+      } finally {
+        setIsLoading(false);
+      }
     }, SEARCH_TIMEOUT);
 
     return () => clearTimeout(executeSearch);

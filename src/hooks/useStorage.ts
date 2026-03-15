@@ -27,26 +27,10 @@ const useStorage = () => {
     return nextEp instanceof Error ? undefined : nextEp;
   };
 
-  const fetchEpisodeData = async (show: IShow) => {
-    const nextUrl = show._links?.nextepisode?.href;
-    const prevUrl = show._links?.previousepisode?.href;
-
-    try {
-      const [next, previous] = await Promise.all([
-        nextUrl ? API.getEpisode(nextUrl) : undefined,
-        prevUrl ? API.getEpisode(prevUrl) : undefined,
-      ]);
-
-      return getEpisodeData(previous, next);
-    } catch {
-      return undefined;
-    }
-  };
-
   const addShow = async (show: IShow) => {
     if (!show || addedShows.some((s) => s.id === show.id)) return;
 
-    const episodeData = await fetchEpisodeData(show);
+    const episodeData = await API.getEpisodeData(show);
 
     const showToSave = episodeData
       ? { ...show, nextEpisodeData: episodeData }
