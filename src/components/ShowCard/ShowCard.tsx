@@ -56,6 +56,14 @@ const ShowCard = (props: ShowProps) => {
     setIsShowAdded(true);
   };
 
+  const handleShowAction = () => {
+    if (buttonType === ButtonType.delete) {
+      setShowDeleteConfirmation(true);
+    } else if (!isShowAdded) {
+      onAddShow();
+    }
+  };
+
   return (
     show && (
       <div className="show-card">
@@ -74,8 +82,7 @@ const ShowCard = (props: ShowProps) => {
             <ActionButton
               isShowAdded={isShowAdded}
               type={buttonType}
-              handleAdd={onAddShow}
-              handleDelete={setShowDeleteConfirmation}
+              onClick={handleShowAction}
             />
           </div>
           <p className="show-premiere-genres">

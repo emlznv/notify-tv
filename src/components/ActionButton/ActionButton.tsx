@@ -5,10 +5,7 @@ import { ActionButtonProps } from './ActionButton.types';
 import './ActionButton.css';
 
 const ActionButton = (props: ActionButtonProps) => {
-  const { isShowAdded, type, handleDelete, handleAdd } = props;
-
-  const onDelete = () => handleDelete && handleDelete(true);
-  const onAdd = () => handleAdd && handleAdd();
+  const { isShowAdded, type, onClick } = props;
 
   const renderButton = () => {
     switch (type) {
@@ -23,7 +20,7 @@ const ActionButton = (props: ActionButtonProps) => {
           <FontAwesomeIcon
             className="add-button"
             icon={faPlusCircle}
-            onClick={onAdd}
+            onClick={onClick}
             size="lg"
           />
         );
@@ -31,7 +28,7 @@ const ActionButton = (props: ActionButtonProps) => {
         return (
           <FontAwesomeIcon
             className="delete-button"
-            onClick={onDelete}
+            onClick={onClick}
             icon={faCircleXmark}
             size="lg"
           />
