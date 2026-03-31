@@ -5,6 +5,16 @@ export interface IShowImage {
   original?: string;
 }
 
+interface Link {
+  href: string;
+}
+
+interface Links {
+  self: Link;
+  nextepisode?: Link;
+  previousepisode?: Link;
+}
+
 export interface IEpisode {
   id: number;
   name: string;
@@ -14,8 +24,14 @@ export interface IEpisode {
   airtime: string;
   airstamp: string;
   rating: { average?: number };
-  image: IShowImage
+  runtime: number;
+  image: IShowImage;
   summary: string;
+  url: string;
+  _links: Links & {
+    show: Links & { name: string }
+  };
+  nextEpisodeData?: IEpisode;
 }
 
 export interface IShow {
@@ -23,10 +39,7 @@ export interface IShow {
   averageRuntime: number;
   ended: string | null;
   genres: Array<string>;
-  image: {
-    medium?: string;
-    original?: string;
-  };
+  image: IShowImage;
   language: string;
   name: string;
   premiered: string;
@@ -36,11 +49,7 @@ export interface IShow {
   summary: string;
   webChannel?: { name: string };
   network?: { name: string };
-  _links: {
-    self: { href: string };
-    nextepisode?: { href: string };
-    previousepisode: { href: string };
-  }
+  _links: Links;
   nextEpisodeData?: IEpisode;
 }
 

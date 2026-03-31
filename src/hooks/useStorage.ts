@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import * as API from '../api/api';
 import { IShow } from '../typescript/interfaces';
 import useSort from './useSort';
 import { Section, StorageKey } from '../typescript/enums';
@@ -18,9 +19,16 @@ const useStorage = () => {
   }, []);
 
   const addShow = async (show: IShow) => {
-    if (!show) return;
+    if (!show || addedShows.some((s) => s.id === show.id)) return;
 
-    const updatedShows = [...addedShows, show];
+    const episodeData = await API.getEpisodeData(show);
+
+    const showToSave = episodeData
+      ? { ...show, nextEpisodeData: episodeData }
+      : show;
+
+    const updatedShows = [...addedShows, showToSave];
+
     await saveToDatabase({ shows: updatedShows });
     setAddedShows(updatedShows);
   };

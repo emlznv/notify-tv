@@ -1,14 +1,10 @@
+import React from 'react';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
+import { SearchBarProps } from './SearchBar.types';
 import './SearchBar.css';
 
-interface IProps {
-  searchValue: string;
-  onValueChange: (value: string) => void;
-}
-
-const SearchBar = (props: IProps) => {
+const SearchBar = (props: SearchBarProps) => {
   const { searchValue, onValueChange } = props;
   return (
     <div className="search-bar">
