@@ -26,7 +26,8 @@
     "preview": "vite preview",
     "lint": "eslint src/*",
     "test": "vitest",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
   },
   "browserslist": {
     "production": [
