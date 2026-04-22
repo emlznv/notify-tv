@@ -15,6 +15,7 @@ const ActionButton = (props: ActionButtonProps) => {
             className="added-button"
             icon={faCircleCheck}
             size="lg"
+            data-testid="added-button"
           />
         ) : (
           <FontAwesomeIcon
@@ -22,6 +23,7 @@ const ActionButton = (props: ActionButtonProps) => {
             icon={faPlusCircle}
             onClick={onClick}
             size="lg"
+            data-testid="add-button"
           />
         );
       case ButtonType.delete:
@@ -31,6 +33,7 @@ const ActionButton = (props: ActionButtonProps) => {
             onClick={onClick}
             icon={faCircleXmark}
             size="lg"
+            data-testid="delete-button"
           />
         );
       default:
