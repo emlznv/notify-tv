@@ -30,6 +30,7 @@ const renderWithContext = (props = {}, contextOverrides = {}) => {
 describe('ShowCard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    window.HTMLElement.prototype.scrollIntoView = vi.fn();
   });
 
   test('it renders the show title, poster, genres, rating, runtime, network', () => {
