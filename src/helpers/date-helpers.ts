@@ -1,8 +1,4 @@
-import { differenceInDays, isSameDay, isAfter, isToday, startOfDay } from 'date-fns';
-
-export const isEpisodeDateToday = (episodeTimestamp?: string) => {
-  return !!episodeTimestamp && isSameDay(new Date(), new Date(episodeTimestamp));
-};
+import { differenceInCalendarDays, isAfter, isToday, startOfDay } from 'date-fns';
 
 export const isEpisodeDateValid = (episodeTimestamp: string) => {
   const episode = new Date(episodeTimestamp);
@@ -10,7 +6,7 @@ export const isEpisodeDateValid = (episodeTimestamp: string) => {
 };
 
 export const getDaysUntilNewEpisode = (episodeTimestamp: string) => {
-  const days = differenceInDays(new Date(episodeTimestamp), new Date());
+  const days = differenceInCalendarDays(new Date(episodeTimestamp), new Date());
 
   if (days === 0) return 'Today';
 

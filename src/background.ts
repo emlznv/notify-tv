@@ -1,6 +1,5 @@
 import { addDays, differenceInDays, isSameDay } from 'date-fns';
 import { DEFAULT_NOTIFICATION_DAYS, UPDATE_DAY_FREQUENCY } from './helpers/constants';
-import { isEpisodeDateToday } from './helpers/date-helpers';
 import { formatNotificationMessage, getNotificationDayText } from './helpers/format-helpers';
 import { IEpisode, IShow, IShowImage } from './typescript/interfaces';
 import * as API from './api/api';
@@ -49,9 +48,10 @@ const shouldUpdateData = (lastUpdated?: string) => {
 
 const updateShowsData = async (shows: IShow[]) => {
   const showPromises = shows.map(async (show) => {
-    if (isEpisodeDateToday(show.nextEpisodeData?.airstamp)) {
-      return show;
-    }
+    const isEpisodeDateToday = show.nextEpisodeData?.airstamp
+      && isSameDay(new Date(), new Date(show.nextEpisodeData.airstamp));
+
+    if (isEpisodeDateToday) { return show; }
 
     try {
       const updatedShow = await API.getEpisode(show._links?.self?.href);

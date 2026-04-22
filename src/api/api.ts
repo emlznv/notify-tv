@@ -1,4 +1,4 @@
-import { isEpisodeDateToday } from '../helpers/date-helpers';
+import { isSameDay } from 'date-fns';
 import { ShowStatus } from '../typescript/enums';
 import { IEpisode, IShow, IShowResponse } from '../typescript/interfaces';
 
@@ -31,7 +31,7 @@ export const getEpisodeData = async (show: IShow): Promise<IEpisode | null> => {
       prevUrl ? getEpisode(prevUrl) : null,
     ]);
 
-    if (previous && isEpisodeDateToday(previous.airstamp)) {
+    if (previous?.airstamp && isSameDay(new Date(), new Date(previous.airstamp))) {
       return previous;
     }
 
