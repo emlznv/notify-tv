@@ -1,43 +1,18 @@
-export const addDays = (date: Date, days: number) => {
-  const result = new Date(date);
-  result.setDate(result.getDate() + days);
-  return result;
-};
+import { differenceInDays, isSameDay, isAfter, isToday, startOfDay } from 'date-fns';
 
 export const isEpisodeDateToday = (episodeTimestamp?: string) => {
-  if (!episodeTimestamp) { return false; }
-
-  const todayDate = new Date();
-  const newEpisodeDate = new Date(episodeTimestamp);
-  const isEpisodeToday = todayDate.getDate() === newEpisodeDate.getDate()
-    && todayDate.getMonth() === newEpisodeDate.getMonth();
-  return isEpisodeToday;
-};
-
-export const getDaysUntilNewEpisode = (episodeTimestamp: string) => {
-  const todayDate = new Date();
-  const newEpisodeDate = new Date(episodeTimestamp);
-  const isEpisodeToday = isEpisodeDateToday(episodeTimestamp);
-
-  if (isEpisodeToday) { return 'Today'; }
-
-  const differenceMs = newEpisodeDate.getTime() - todayDate.getTime();
-  const differenceDays = differenceMs / (1000 * 3600 * 24);
-  const shouldRoundUp = addDays(todayDate, Math.ceil(differenceDays)).getDate() === newEpisodeDate.getDate();
-  const differenceDaysRounded = shouldRoundUp ? Math.ceil(differenceDays) : Math.floor(differenceDays);
-
-  return `${differenceDaysRounded} ${differenceDaysRounded > 1 ? 'days' : 'day'}`;
+  return !!episodeTimestamp && isSameDay(new Date(), new Date(episodeTimestamp));
 };
 
 export const isEpisodeDateValid = (episodeTimestamp: string) => {
-  const todayDate = new Date();
-  const episodeDate = new Date(episodeTimestamp);
-  const isEpisodeInFuture = episodeDate > todayDate;
-  const isEpisodeToday = isEpisodeDateToday(episodeTimestamp);
-  return isEpisodeInFuture || isEpisodeToday;
+  const episode = new Date(episodeTimestamp);
+  return isToday(episode) || isAfter(episode, startOfDay(new Date()));
 };
 
-export const getDaysDifferenceBetweenDates = (futureDate: Date, pastDate: Date) => {
-  const differenceMs = futureDate.getTime() - pastDate.getTime();
-  return differenceMs / (1000 * 3600 * 24);
+export const getDaysUntilNewEpisode = (episodeTimestamp: string) => {
+  const days = differenceInDays(new Date(episodeTimestamp), new Date());
+
+  if (days === 0) return 'Today';
+
+  return `${days} ${days === 1 ? 'day' : 'days'}`;
 };

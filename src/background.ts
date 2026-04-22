@@ -1,5 +1,6 @@
+import { addDays, differenceInDays, isSameDay } from 'date-fns';
 import { DEFAULT_NOTIFICATION_DAYS, UPDATE_DAY_FREQUENCY } from './helpers/constants';
-import { addDays, getDaysDifferenceBetweenDates, isEpisodeDateToday } from './helpers/date-helpers';
+import { isEpisodeDateToday } from './helpers/date-helpers';
 import { formatNotificationMessage, getNotificationDayText } from './helpers/format-helpers';
 import { IEpisode, IShow, IShowImage } from './typescript/interfaces';
 import * as API from './api/api';
@@ -33,11 +34,7 @@ const getNotificationDayForEpisode = (notificationDays: string[], episodeTimesta
     .map(Number)
     .find((day) => {
       const notificationDate = addDays(todayDate, day);
-      return (
-        notificationDate.getDate() === newEpisodeDate.getDate()
-      && notificationDate.getMonth() === newEpisodeDate.getMonth()
-      && notificationDate.getFullYear() === newEpisodeDate.getFullYear()
-      );
+      return isSameDay(notificationDate, newEpisodeDate);
     });
 };
 
@@ -46,7 +43,7 @@ const shouldUpdateData = (lastUpdated?: string) => {
   const todayDate = new Date();
   const lastUpdatedDate = new Date(lastUpdated);
 
-  const differenceDays = getDaysDifferenceBetweenDates(todayDate, lastUpdatedDate);
+  const differenceDays = differenceInDays(todayDate, lastUpdatedDate);
   return differenceDays >= UPDATE_DAY_FREQUENCY;
 };
 
