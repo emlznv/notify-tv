@@ -13,8 +13,14 @@ export const getShowsBySearch = async (searchTerm: string) => {
     .map((item) => item.show);
 };
 
-export const getEpisode = async (endpoint: string): Promise<IEpisode> => {
-  const response = await fetch(endpoint);
+export const getEpisodeByUrl = async (url: string): Promise<IEpisode> => {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
+  return response.json();
+};
+
+export const getShowByUrl = async (url: string): Promise<IShow> => {
+  const response = await fetch(url);
   if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
   return response.json();
 };
@@ -27,8 +33,8 @@ export const getEpisodeData = async (show: IShow): Promise<IEpisode | null> => {
 
   try {
     const [next, previous] = await Promise.all([
-      nextUrl ? getEpisode(nextUrl) : null,
-      prevUrl ? getEpisode(prevUrl) : null,
+      nextUrl ? getEpisodeByUrl(nextUrl) : null,
+      prevUrl ? getEpisodeByUrl(prevUrl) : null,
     ]);
 
     if (previous?.airstamp && isSameDay(new Date(), new Date(previous.airstamp))) {

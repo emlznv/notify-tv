@@ -3,7 +3,7 @@ import { DEFAULT_NOTIFICATION_DAYS, UPDATE_DAY_FREQUENCY } from './helpers/const
 import { formatNotificationMessage, getNotificationDayText } from './helpers/format-helpers';
 import { IEpisode, IShow, IShowImage } from './typescript/interfaces';
 import * as API from './api/api';
-import { StorageKey } from './typescript/enums';
+import { NotificationDay, StorageKey } from './typescript/enums';
 import { getFromDatabase, saveToDatabase } from './helpers/database-helpers';
 
 const setDefaultNotificationDays = async () => {
@@ -23,7 +23,7 @@ const createNotification = ({ dayForNotification, data, showName, image }:
   });
 };
 
-const getNotificationDayForEpisode = (notificationDays: string[], episodeTimestamp?: string) => {
+const getNotificationDayForEpisode = (notificationDays: NotificationDay[], episodeTimestamp?: string) => {
   if (!episodeTimestamp) { return; }
 
   const todayDate = new Date();
@@ -46,27 +46,27 @@ const shouldUpdateData = (lastUpdated?: string) => {
   return differenceDays >= UPDATE_DAY_FREQUENCY;
 };
 
+const updateShow = async (show: IShow) => {
+  const updatedShow = await API.getShowByUrl(show._links?.self?.href);
+  if (!updatedShow || !updatedShow._links?.nextepisode?.href) return show;
+
+  const updatedNextEpisodeData = await API.getEpisodeByUrl(updatedShow._links.nextepisode.href);
+  if (updatedNextEpisodeData) {
+    updatedShow.nextEpisodeData = updatedNextEpisodeData;
+  }
+
+  return updatedShow;
+};
+
 const updateShowsData = async (shows: IShow[]) => {
   const showPromises = shows.map(async (show) => {
     const isEpisodeDateToday = show.nextEpisodeData?.airstamp
       && isSameDay(new Date(), new Date(show.nextEpisodeData.airstamp));
 
-    if (isEpisodeDateToday) { return show; }
+    if (isEpisodeDateToday) return show;
 
     try {
-      const updatedShow = await API.getEpisode(show._links?.self?.href);
-      if (!updatedShow || !updatedShow._links?.nextepisode?.href) {
-        return show;
-      }
-
-      try {
-        const updatedNextEpisodeData = await API.getEpisode(updatedShow._links.nextepisode.href);
-        if (updatedNextEpisodeData) {
-          updatedShow.nextEpisodeData = updatedNextEpisodeData;
-        }
-      } catch (err) { return show; }
-
-      return updatedShow;
+      return await updateShow(show);
     } catch (err) {
       return show;
     }
@@ -77,30 +77,25 @@ const updateShowsData = async (shows: IShow[]) => {
   return updatedShows;
 };
 
+const notifyForShow = (show: IShow, notificationDays: NotificationDay[]) => {
+  const dayForNotification = getNotificationDayForEpisode(notificationDays, show.nextEpisodeData?.airstamp);
+  if (dayForNotification === undefined || !show.nextEpisodeData) return false;
+
+  createNotification({ dayForNotification, data: show.nextEpisodeData, showName: show.name, image: show.image });
+  return true;
+};
+
 const notifyForNextEpisode = async () => {
   const { shows, lastUpdated, lastNotified, notificationDays } = await getFromDatabase();
-  const shouldNotify = shouldUpdateData(lastNotified);
-  let isNotificationSent = false;
 
-  if (!shows?.length || !shouldNotify) return;
+  if (!shows?.length || !shouldUpdateData(lastNotified)) return;
 
-  const upToDateShows = shouldUpdateData(lastUpdated)
-    ? await updateShowsData(shows)
-    : shows;
+  const upToDateShows = shouldUpdateData(lastUpdated) ? await updateShowsData(shows) : shows;
 
-  upToDateShows.forEach((show: IShow) => {
-    const dayForNotification = getNotificationDayForEpisode(notificationDays, show.nextEpisodeData?.airstamp);
+  const isNotificationSent = upToDateShows
+    .some((show: IShow) => notifyForShow(show, notificationDays));
 
-    if (dayForNotification !== undefined && show.nextEpisodeData) {
-      createNotification({ dayForNotification, data: show.nextEpisodeData, showName: show.name, image: show.image });
-      isNotificationSent = true;
-    }
-  });
-
-  if (isNotificationSent) {
-    await saveToDatabase({ lastNotified: new Date().toISOString() });
-  }
-
+  isNotificationSent && await saveToDatabase({ lastNotified: new Date().toISOString() });
   await saveToDatabase({ shows: upToDateShows });
 };
 
