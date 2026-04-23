@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { faArrowUpAZ } from '@fortawesome/free-solid-svg-icons';
 import ShowCard from './ShowCard';
 import { Section } from '../../typescript/enums';
-import { StorageContext } from '../../context/storage-context';
+import { StorageContext } from '../../context/StorageContextProvider';
 import { mockShows } from '../../tests/mocks';
 
 const defaultProps = {

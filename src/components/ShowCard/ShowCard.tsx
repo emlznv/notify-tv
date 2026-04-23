@@ -10,7 +10,7 @@ import {
 } from '../../helpers/format-helpers';
 import { ButtonType, Section, ShowStatus } from '../../typescript/enums';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
-import { StorageContext } from '../../context/storage-context';
+import { StorageContext } from '../../context/StorageContextProvider';
 import { getDaysUntilNewEpisode, isEpisodeDateValid } from '../../helpers/date-helpers';
 import { SEPARATOR } from '../../helpers/constants';
 import { ShowProps } from './ShowCard.types';
