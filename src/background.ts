@@ -13,11 +13,10 @@ const setDefaultNotificationDays = async () => {
   await saveToDatabase({ notificationDays: DEFAULT_NOTIFICATION_DAYS });
 };
 
-const createNotification = ({ notificationDay, data, showName, image }:
-  { notificationDay: NotificationDay, data: IEpisode, showName: string, image: IShowImage }) => {
+const createNotification = ({ key, notificationDay, data, showName, image }:
+  { key: string, notificationDay: NotificationDay, data: IEpisode, showName: string, image: IShowImage }) => {
   const icon = image?.medium || '../public/logo.png';
   const title = `${showName}: new episode ${getNotificationDayText(notificationDay)}!`;
-  const key = `${showName}-${data.id}-${notificationDay}`;
 
   chrome.notifications.create(
     key,
@@ -81,26 +80,28 @@ const updateStaleShowData = async () => {
 };
 
 const handleEpisodeNotifications = async () => {
-  const { shows, notificationDays } = await getFromDatabase();
-  let isNotificationSent = false;
+  const { shows, notificationDays, sentNotifications = [] } = await getFromDatabase();
 
   shows.forEach((show: IShow) => {
     const notificationDay = findNotificationEpisodeMatch(notificationDays, show.nextEpisodeData?.airstamp);
     if (notificationDay === undefined || !show.nextEpisodeData) return;
 
-    createNotification({ notificationDay, data: show.nextEpisodeData, showName: show.name, image: show.image });
-    isNotificationSent = true;
+    const key = `${show.id}-${show.nextEpisodeData.id}-${notificationDay}`;
+
+    if (sentNotifications.includes(key)) return;
+
+    createNotification({ key, notificationDay, data: show.nextEpisodeData, showName: show.name, image: show.image });
+    sentNotifications.push(key);
   });
 
-  isNotificationSent && await saveToDatabase({ lastNotified: new Date().toISOString() });
+  await saveToDatabase({ sentNotifications });
 };
 
 const migrateFromChromeStorage = async () => {
   const oldData = await chrome.storage.local.get([
     StorageKey.shows,
     StorageKey.notificationDays,
-    StorageKey.sortType,
-    StorageKey.lastNotified
+    StorageKey.sortType
   ]);
 
   if (Object.keys(oldData).length > 0) {
