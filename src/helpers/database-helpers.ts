@@ -6,7 +6,6 @@ export const saveToDatabase = async (data: {
   shows?: IShow[];
   notificationDays?: string[];
   sortType?: string;
-  lastUpdated?: string;
   lastNotified?: string;
 }) => {
   if (data.shows) {

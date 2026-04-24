@@ -1,5 +1,5 @@
-import { addDays, differenceInDays, isSameDay } from 'date-fns';
-import { DEFAULT_NOTIFICATION_DAYS, UPDATE_DAY_FREQUENCY } from './helpers/constants';
+import { addDays, isSameDay } from 'date-fns';
+import { DEFAULT_NOTIFICATION_DAYS } from './helpers/constants';
 import { formatNotificationMessage, getNotificationDayText } from './helpers/format-helpers';
 import { IEpisode, IShow, IShowImage } from './typescript/interfaces';
 import * as API from './api/api';
@@ -43,16 +43,7 @@ const findNotificationEpisodeMatch = (notificationDays: NotificationDay[], episo
     });
 };
 
-const shouldUpdateData = (lastUpdated?: string) => {
-  if (!lastUpdated) { return true; }
-  const todayDate = new Date();
-  const lastUpdatedDate = new Date(lastUpdated);
-
-  const differenceDays = differenceInDays(todayDate, lastUpdatedDate);
-  return differenceDays >= UPDATE_DAY_FREQUENCY;
-};
-
-const updateShow = async (show: IShow) => {
+const fetchShowData = async (show: IShow) => {
   const updatedShow = await API.getShowByUrl(show._links?.self?.href);
   if (!updatedShow || !updatedShow._links?.nextepisode?.href) return show;
 
@@ -72,29 +63,25 @@ const updateShowData = async (shows: IShow[]) => {
     if (isEpisodeDateToday) return show;
 
     try {
-      return await updateShow(show);
+      return await fetchShowData(show);
     } catch (err) {
       return show;
     }
   });
 
-  const updatedShows = await Promise.all(showPromises);
-  await saveToDatabase({ lastUpdated: new Date().toISOString() });
-  return updatedShows;
+  return Promise.all(showPromises);
 };
 
-const handleStaleDataUpdate = async (): Promise<IShow[]> => {
-  const { shows, lastUpdated } = await getFromDatabase();
+const updateStaleShowData = async () => {
+  const { shows } = await getFromDatabase();
   if (!shows?.length) return [];
 
-  const updatedShows = shouldUpdateData(lastUpdated) ? await updateShowData(shows) : shows;
+  const updatedShows = await updateShowData(shows);
   await saveToDatabase({ shows: updatedShows });
-  return updatedShows;
 };
 
 const handleEpisodeNotifications = async () => {
-  const { notificationDays } = await getFromDatabase();
-  const shows = await handleStaleDataUpdate();
+  const { shows, notificationDays } = await getFromDatabase();
   let isNotificationSent = false;
 
   shows.forEach((show: IShow) => {
@@ -113,7 +100,6 @@ const migrateFromChromeStorage = async () => {
     StorageKey.shows,
     StorageKey.notificationDays,
     StorageKey.sortType,
-    StorageKey.lastUpdated,
     StorageKey.lastNotified
   ]);
 
@@ -149,7 +135,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
       handleEpisodeNotifications();
       break;
     case UPDATE_ALARM:
-      handleStaleDataUpdate();
+      updateStaleShowData();
       break;
     default:
       break;
