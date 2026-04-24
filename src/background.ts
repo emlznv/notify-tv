@@ -6,7 +6,8 @@ import * as API from './api/api';
 import { NotificationDay, StorageKey } from './typescript/enums';
 import { getFromDatabase, saveToDatabase } from './helpers/database-helpers';
 
-const NOTIFICATION_ALARM = 'notifications';
+const NOTIFICATION_ALARM = 'check-notifications';
+const UPDATE_ALARM = 'update-shows';
 
 const setDefaultNotificationDays = async () => {
   await saveToDatabase({ notificationDays: DEFAULT_NOTIFICATION_DAYS });
@@ -82,15 +83,16 @@ const updateShowData = async (shows: IShow[]) => {
   return updatedShows;
 };
 
-const handleStaleDataUpdate = async () => {
-  const { shows, lastUpdated, lastNotified } = await getFromDatabase();
-  const shouldNotCheckForUpdate = !shows?.length || !shouldUpdateData(lastNotified);
-  if (shouldNotCheckForUpdate) return;
+const handleStaleDataUpdate = async (): Promise<IShow[]> => {
+  const { shows, lastUpdated } = await getFromDatabase();
+  if (!shows?.length) return [];
 
-  return shouldUpdateData(lastUpdated) ? updateShowData(shows) : shows;
+  const updatedShows = shouldUpdateData(lastUpdated) ? await updateShowData(shows) : shows;
+  await saveToDatabase({ shows: updatedShows });
+  return updatedShows;
 };
 
-const notifyForNextEpisode = async () => {
+const handleEpisodeNotifications = async () => {
   const { notificationDays } = await getFromDatabase();
   const shows = await handleStaleDataUpdate();
   let isNotificationSent = false;
@@ -104,7 +106,6 @@ const notifyForNextEpisode = async () => {
   });
 
   isNotificationSent && await saveToDatabase({ lastNotified: new Date().toISOString() });
-  await saveToDatabase({ shows });
 };
 
 const migrateFromChromeStorage = async () => {
@@ -131,10 +132,28 @@ const createAlarms = () => {
       });
     }
   });
+
+  chrome.alarms.get(UPDATE_ALARM, (alarm) => {
+    if (!alarm) {
+      chrome.alarms.create(UPDATE_ALARM, {
+        delayInMinutes: 1,
+        periodInMinutes: 60 * 12 // run every 12 hours
+      });
+    }
+  });
 };
 
 chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === NOTIFICATION_ALARM) notifyForNextEpisode();
+  switch (alarm.name) {
+    case NOTIFICATION_ALARM:
+      handleEpisodeNotifications();
+      break;
+    case UPDATE_ALARM:
+      handleStaleDataUpdate();
+      break;
+    default:
+      break;
+  }
 });
 
 chrome.runtime.onStartup.addListener(() => {
