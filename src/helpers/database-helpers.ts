@@ -6,8 +6,7 @@ export const saveToDatabase = async (data: {
   shows?: IShow[];
   notificationDays?: string[];
   sortType?: string;
-  lastUpdated?: string;
-  lastNotified?: string;
+  sentNotifications?: string[];
 }) => {
   if (data.shows) {
     await db.shows.clear();

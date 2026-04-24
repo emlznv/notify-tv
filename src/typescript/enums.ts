@@ -22,8 +22,7 @@ export enum NotificationDay {
 
 export enum StorageKey {
   shows = 'shows',
-  lastUpdated = 'lastUpdated',
-  lastNotified = 'lastNotified',
+  sentNotifications = 'sentNotifications',
   notificationDays = 'notificationDays',
   sortType = 'sortType'
 }
