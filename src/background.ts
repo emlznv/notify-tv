@@ -6,33 +6,39 @@ import * as API from './api/api';
 import { NotificationDay, StorageKey } from './typescript/enums';
 import { getFromDatabase, saveToDatabase } from './helpers/database-helpers';
 
+const NOTIFICATION_ALARM = 'check-notifications';
+const UPDATE_ALARM = 'update-shows';
+
 const setDefaultNotificationDays = async () => {
   await saveToDatabase({ notificationDays: DEFAULT_NOTIFICATION_DAYS });
 };
 
-const createNotification = ({ dayForNotification, data, showName, image }:
-  { dayForNotification: number, data: IEpisode, showName: string, image: IShowImage }) => {
+const createNotification = ({ notificationDay, data, showName, image }:
+  { notificationDay: NotificationDay, data: IEpisode, showName: string, image: IShowImage }) => {
   const icon = image?.medium || '../public/logo.png';
-  const title = `${showName}: new episode ${getNotificationDayText(dayForNotification)}!`;
+  const title = `${showName}: new episode ${getNotificationDayText(notificationDay)}!`;
+  const key = `${showName}-${data.id}-${notificationDay}`;
 
-  chrome.notifications.create('', {
-    title,
-    message: formatNotificationMessage(data),
-    iconUrl: `${icon}`,
-    type: 'basic'
-  });
+  chrome.notifications.create(
+    key,
+    {
+      title,
+      message: formatNotificationMessage(data),
+      iconUrl: `${icon}`,
+      type: 'basic'
+    }
+  );
 };
 
-const getNotificationDayForEpisode = (notificationDays: NotificationDay[], episodeTimestamp?: string) => {
-  if (!episodeTimestamp) { return; }
+const findNotificationEpisodeMatch = (notificationDays: NotificationDay[], episodeTimestamp?: string) => {
+  if (!episodeTimestamp) return;
 
   const todayDate = new Date();
   const newEpisodeDate = new Date(episodeTimestamp);
 
   return notificationDays
-    .map(Number)
     .find((day) => {
-      const notificationDate = addDays(todayDate, day);
+      const notificationDate = addDays(todayDate, Number(day));
       return isSameDay(notificationDate, newEpisodeDate);
     });
 };
@@ -58,7 +64,7 @@ const updateShow = async (show: IShow) => {
   return updatedShow;
 };
 
-const updateShowsData = async (shows: IShow[]) => {
+const updateShowData = async (shows: IShow[]) => {
   const showPromises = shows.map(async (show) => {
     const isEpisodeDateToday = show.nextEpisodeData?.airstamp
       && isSameDay(new Date(), new Date(show.nextEpisodeData.airstamp));
@@ -77,32 +83,29 @@ const updateShowsData = async (shows: IShow[]) => {
   return updatedShows;
 };
 
-const notifyForShow = (show: IShow, notificationDays: NotificationDay[]) => {
-  const dayForNotification = getNotificationDayForEpisode(notificationDays, show.nextEpisodeData?.airstamp);
-  if (dayForNotification === undefined || !show.nextEpisodeData) return false;
+const handleStaleDataUpdate = async (): Promise<IShow[]> => {
+  const { shows, lastUpdated } = await getFromDatabase();
+  if (!shows?.length) return [];
 
-  createNotification({ dayForNotification, data: show.nextEpisodeData, showName: show.name, image: show.image });
-  return true;
+  const updatedShows = shouldUpdateData(lastUpdated) ? await updateShowData(shows) : shows;
+  await saveToDatabase({ shows: updatedShows });
+  return updatedShows;
 };
 
-const notifyForNextEpisode = async () => {
-  const { shows, lastUpdated, lastNotified, notificationDays } = await getFromDatabase();
-
-  if (!shows?.length || !shouldUpdateData(lastNotified)) return;
-
-  const upToDateShows = shouldUpdateData(lastUpdated) ? await updateShowsData(shows) : shows;
-
+const handleEpisodeNotifications = async () => {
+  const { notificationDays } = await getFromDatabase();
+  const shows = await handleStaleDataUpdate();
   let isNotificationSent = false;
 
-  upToDateShows.forEach((show: IShow) => {
-    const sent = notifyForShow(show, notificationDays);
-    if (sent) {
-      isNotificationSent = true;
-    }
+  shows.forEach((show: IShow) => {
+    const notificationDay = findNotificationEpisodeMatch(notificationDays, show.nextEpisodeData?.airstamp);
+    if (notificationDay === undefined || !show.nextEpisodeData) return;
+
+    createNotification({ notificationDay, data: show.nextEpisodeData, showName: show.name, image: show.image });
+    isNotificationSent = true;
   });
 
   isNotificationSent && await saveToDatabase({ lastNotified: new Date().toISOString() });
-  await saveToDatabase({ shows: upToDateShows });
 };
 
 const migrateFromChromeStorage = async () => {
@@ -120,11 +123,45 @@ const migrateFromChromeStorage = async () => {
   }
 };
 
+const createAlarms = () => {
+  chrome.alarms.get(NOTIFICATION_ALARM, (alarm) => {
+    if (!alarm) {
+      chrome.alarms.create(NOTIFICATION_ALARM, {
+        delayInMinutes: 1,
+        periodInMinutes: 60 * 6 // run every 6 hours
+      });
+    }
+  });
+
+  chrome.alarms.get(UPDATE_ALARM, (alarm) => {
+    if (!alarm) {
+      chrome.alarms.create(UPDATE_ALARM, {
+        delayInMinutes: 1,
+        periodInMinutes: 60 * 12 // run every 12 hours
+      });
+    }
+  });
+};
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  switch (alarm.name) {
+    case NOTIFICATION_ALARM:
+      handleEpisodeNotifications();
+      break;
+    case UPDATE_ALARM:
+      handleStaleDataUpdate();
+      break;
+    default:
+      break;
+  }
+});
+
 chrome.runtime.onStartup.addListener(() => {
-  notifyForNextEpisode();
+  createAlarms();
 });
 
 chrome.runtime.onInstalled.addListener(async () => {
-  setDefaultNotificationDays();
+  await setDefaultNotificationDays();
   await migrateFromChromeStorage();
+  createAlarms();
 });

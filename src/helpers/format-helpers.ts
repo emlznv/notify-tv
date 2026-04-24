@@ -1,3 +1,4 @@
+import { NotificationDay } from '../typescript/enums';
 import { IEpisode } from '../typescript/interfaces';
 import { NO_INFO_TEXT, NO_SUMMARY_TEXT } from './constants';
 
@@ -50,13 +51,13 @@ export const formatNotificationMessage = (episode: IEpisode) => {
   return `${name} ${seasonAndEpisode}`;
 };
 
-export const getNotificationDayText = (day: number) => {
+export const getNotificationDayText = (day: NotificationDay) => {
   switch (day) {
-    case 0:
+    case NotificationDay.sameDay:
       return 'today';
-    case 1:
+    case NotificationDay.oneDayBefore:
       return 'tomorrow';
-    case 3:
+    case NotificationDay.threeDaysBefore:
       return 'in 3 days';
     default:
       break;
