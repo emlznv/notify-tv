@@ -6,17 +6,17 @@ import * as API from './api/api';
 import { NotificationDay, StorageKey } from './typescript/enums';
 import { getFromDatabase, saveToDatabase } from './helpers/database-helpers';
 
-const NOTIFICATION_ALARM = 'check-notifications';
+const NOTIFICATION_ALARM = 'notifications';
 
 const setDefaultNotificationDays = async () => {
   await saveToDatabase({ notificationDays: DEFAULT_NOTIFICATION_DAYS });
 };
 
-const createNotification = ({ dayForNotification, data, showName, image }:
-  { dayForNotification: number, data: IEpisode, showName: string, image: IShowImage }) => {
+const createNotification = ({ notificationDay, data, showName, image }:
+  { notificationDay: NotificationDay, data: IEpisode, showName: string, image: IShowImage }) => {
   const icon = image?.medium || '../public/logo.png';
-  const title = `${showName}: new episode ${getNotificationDayText(dayForNotification)}!`;
-  const key = `${showName}-${data.id}-${dayForNotification}`;
+  const title = `${showName}: new episode ${getNotificationDayText(notificationDay)}!`;
+  const key = `${showName}-${data.id}-${notificationDay}`;
 
   chrome.notifications.create(
     key,
@@ -29,16 +29,15 @@ const createNotification = ({ dayForNotification, data, showName, image }:
   );
 };
 
-const getNotificationDayForEpisode = (notificationDays: NotificationDay[], episodeTimestamp?: string) => {
+const findNotificationEpisodeMatch = (notificationDays: NotificationDay[], episodeTimestamp?: string) => {
   if (!episodeTimestamp) return;
 
   const todayDate = new Date();
   const newEpisodeDate = new Date(episodeTimestamp);
 
   return notificationDays
-    .map(Number)
     .find((day) => {
-      const notificationDate = addDays(todayDate, day);
+      const notificationDate = addDays(todayDate, Number(day));
       return isSameDay(notificationDate, newEpisodeDate);
     });
 };
@@ -64,7 +63,7 @@ const updateShow = async (show: IShow) => {
   return updatedShow;
 };
 
-const updateShowsData = async (shows: IShow[]) => {
+const updateShowData = async (shows: IShow[]) => {
   const showPromises = shows.map(async (show) => {
     const isEpisodeDateToday = show.nextEpisodeData?.airstamp
       && isSameDay(new Date(), new Date(show.nextEpisodeData.airstamp));
@@ -83,32 +82,29 @@ const updateShowsData = async (shows: IShow[]) => {
   return updatedShows;
 };
 
-const notifyForShow = (show: IShow, notificationDays: NotificationDay[]) => {
-  const dayForNotification = getNotificationDayForEpisode(notificationDays, show.nextEpisodeData?.airstamp);
-  if (dayForNotification === undefined || !show.nextEpisodeData) return false;
+const handleStaleDataUpdate = async () => {
+  const { shows, lastUpdated, lastNotified } = await getFromDatabase();
+  const shouldNotCheckForUpdate = !shows?.length || !shouldUpdateData(lastNotified);
+  if (shouldNotCheckForUpdate) return;
 
-  createNotification({ dayForNotification, data: show.nextEpisodeData, showName: show.name, image: show.image });
-  return true;
+  return shouldUpdateData(lastUpdated) ? updateShowData(shows) : shows;
 };
 
 const notifyForNextEpisode = async () => {
-  const { shows, lastUpdated, lastNotified, notificationDays } = await getFromDatabase();
-
-  if (!shows?.length || !shouldUpdateData(lastNotified)) return;
-
-  const upToDateShows = shouldUpdateData(lastUpdated) ? await updateShowsData(shows) : shows;
-
+  const { notificationDays } = await getFromDatabase();
+  const shows = await handleStaleDataUpdate();
   let isNotificationSent = false;
 
-  upToDateShows.forEach((show: IShow) => {
-    const sent = notifyForShow(show, notificationDays);
-    if (sent) {
-      isNotificationSent = true;
-    }
+  shows.forEach((show: IShow) => {
+    const notificationDay = findNotificationEpisodeMatch(notificationDays, show.nextEpisodeData?.airstamp);
+    if (notificationDay === undefined || !show.nextEpisodeData) return;
+
+    createNotification({ notificationDay, data: show.nextEpisodeData, showName: show.name, image: show.image });
+    isNotificationSent = true;
   });
 
   isNotificationSent && await saveToDatabase({ lastNotified: new Date().toISOString() });
-  await saveToDatabase({ shows: upToDateShows });
+  await saveToDatabase({ shows });
 };
 
 const migrateFromChromeStorage = async () => {
