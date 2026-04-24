@@ -6,6 +6,8 @@ import * as API from './api/api';
 import { NotificationDay, StorageKey } from './typescript/enums';
 import { getFromDatabase, saveToDatabase } from './helpers/database-helpers';
 
+const NOTIFICATION_ALARM = 'check-notifications';
+
 const setDefaultNotificationDays = async () => {
   await saveToDatabase({ notificationDays: DEFAULT_NOTIFICATION_DAYS });
 };
@@ -14,17 +16,21 @@ const createNotification = ({ dayForNotification, data, showName, image }:
   { dayForNotification: number, data: IEpisode, showName: string, image: IShowImage }) => {
   const icon = image?.medium || '../public/logo.png';
   const title = `${showName}: new episode ${getNotificationDayText(dayForNotification)}!`;
+  const key = `${showName}-${data.id}-${dayForNotification}`;
 
-  chrome.notifications.create('', {
-    title,
-    message: formatNotificationMessage(data),
-    iconUrl: `${icon}`,
-    type: 'basic'
-  });
+  chrome.notifications.create(
+    key,
+    {
+      title,
+      message: formatNotificationMessage(data),
+      iconUrl: `${icon}`,
+      type: 'basic'
+    }
+  );
 };
 
 const getNotificationDayForEpisode = (notificationDays: NotificationDay[], episodeTimestamp?: string) => {
-  if (!episodeTimestamp) { return; }
+  if (!episodeTimestamp) return;
 
   const todayDate = new Date();
   const newEpisodeDate = new Date(episodeTimestamp);
@@ -120,11 +126,27 @@ const migrateFromChromeStorage = async () => {
   }
 };
 
+const createAlarms = () => {
+  chrome.alarms.get(NOTIFICATION_ALARM, (alarm) => {
+    if (!alarm) {
+      chrome.alarms.create(NOTIFICATION_ALARM, {
+        delayInMinutes: 1,
+        periodInMinutes: 60 * 6 // run every 6 hours
+      });
+    }
+  });
+};
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === NOTIFICATION_ALARM) notifyForNextEpisode();
+});
+
 chrome.runtime.onStartup.addListener(() => {
-  notifyForNextEpisode();
+  createAlarms();
 });
 
 chrome.runtime.onInstalled.addListener(async () => {
-  setDefaultNotificationDays();
+  await setDefaultNotificationDays();
   await migrateFromChromeStorage();
+  createAlarms();
 });
