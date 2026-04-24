@@ -92,8 +92,14 @@ const notifyForNextEpisode = async () => {
 
   const upToDateShows = shouldUpdateData(lastUpdated) ? await updateShowsData(shows) : shows;
 
-  const isNotificationSent = upToDateShows
-    .some((show: IShow) => notifyForShow(show, notificationDays));
+  let isNotificationSent = false;
+
+  upToDateShows.forEach((show: IShow) => {
+    const sent = notifyForShow(show, notificationDays);
+    if (sent) {
+      isNotificationSent = true;
+    }
+  });
 
   isNotificationSent && await saveToDatabase({ lastNotified: new Date().toISOString() });
   await saveToDatabase({ shows: upToDateShows });
