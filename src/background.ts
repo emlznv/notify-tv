@@ -71,12 +71,27 @@ const updateShowData = async (shows: IShow[]) => {
   return Promise.all(showPromises);
 };
 
+const clearStaleSentNotifications = (shows: IShow[], sentNotifications: string[]): string[] => {
+  const activeKeys = new Set(
+    shows.flatMap((show: IShow) => (show.nextEpisodeData
+      ? Object.values(NotificationDay).map((day) => `${show.id}-${show.nextEpisodeData!.id}-${day}`)
+      : []))
+  );
+
+  return sentNotifications.filter((key: string) => activeKeys.has(key));
+};
+
 const updateStaleShowData = async () => {
-  const { shows } = await getFromDatabase();
+  const { shows, sentNotifications = [] } = await getFromDatabase();
   if (!shows?.length) return [];
 
   const updatedShows = await updateShowData(shows);
-  await saveToDatabase({ shows: updatedShows });
+  const notifications = clearStaleSentNotifications(updatedShows, sentNotifications);
+  await saveToDatabase({ shows: updatedShows, sentNotifications: notifications });
+};
+
+const formatNotificationKey = (show: IShow, notificationDay: NotificationDay) => {
+  return `${show.id}-${show.nextEpisodeData?.id}-${notificationDay}`;
 };
 
 const handleEpisodeNotifications = async () => {
@@ -86,7 +101,7 @@ const handleEpisodeNotifications = async () => {
     const notificationDay = findNotificationEpisodeMatch(notificationDays, show.nextEpisodeData?.airstamp);
     if (notificationDay === undefined || !show.nextEpisodeData) return;
 
-    const key = `${show.id}-${show.nextEpisodeData.id}-${notificationDay}`;
+    const key = formatNotificationKey(show, notificationDay);
 
     if (sentNotifications.includes(key)) return;
 
